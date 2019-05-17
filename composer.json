@@ -1,7 +1,31 @@
 {
-    "name": "netleak/testovaci-composer-package",
-    "description": "Můj testovací balíček pro composer",
-    "require": {
-        "php": "^7.2"
-    }
+	"name": "netleak/testovaci-composer-package",
+	"description": "Můj testovací balíček pro composer",
+	"keywords": [
+		"nette",
+		"test",
+		"package"
+	],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Jan 'Netleak' Ženíšek",
+			"email": "jan.zenisek@outlook.com"
+		}
+	],
+	"minimum-stability": "stable",
+	"require": {
+		"php": "^7.2",
+		"nette/di": "2.4.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"Netleak\\": "src/"
+		}
+	},
+	"require-dev": {
+		"phpstan/phpstan": "^0.9.2",
+		"consistence/coding-standard": "^3.2",
+		"slevomat/coding-standard": "^4.6"
+	}
 }

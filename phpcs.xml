@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ruleset name="Netleaks">
+	<rule ref="Zend">
+		<exclude name="Generic.WhiteSpace.DisallowTabIndent.TabsUsed"/>
+		<exclude name="Generic.Files.LineLength.MaxExceeded"/>
+		<exclude name="Generic.Functions.OpeningFunctionBraceBsdAllman.BraceOnSameLine"/>
+		<exclude name="PEAR.Classes.ClassDeclaration.OpenBraceNewLine"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+		<exclude name="Zend.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
+	</rule>
+
+	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
+
+	<rule ref="PSR1.Methods.CamelCapsMethodName">
+		<exclude-pattern>*Test.php</exclude-pattern>
+	</rule>
+
+	<rule ref="vendor/consistence/coding-standard/Consistence/ruleset.xml">
+		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameAfterKeyword"/>
+		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation.NonFullyQualifiedClassName"/>
+		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions.NonFullyQualified"/>
+		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions"/>
+		<exclude name="SlevomatCodingStandard.Types.EmptyLinesAroundTypeBraces"/>
+		<exclude name="SlevomatCodingStandard.Classes.UnusedPrivateElements.WriteOnlyProperty"/>
+		<exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
+		<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+	</rule>
+
+	<rule ref="Consistence.Exceptions.ExceptionDeclaration">
+		<properties>
+			<property name="exceptionsDirectoryName" type="string" value="Exception"/>
+		</properties>
+	</rule>
+
+	<rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/ruleset.xml">
+		<exclude name="SlevomatCodingStandard.ControlStructures.DisallowEmpty.DisallowedEmpty"/>
+		<exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces.NonFullyQualified"/>
+		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
+		<exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison.RequiredYodaComparison"/>
+		<exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment.OneLinePropertyComment"/>
+
+		<properties>
+			<property name="rootNamespaces" type="array" value="src=>App"/>
+		</properties>
+	</rule>
+
+	<rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly"/>
+
+	<rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
+
+	<rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+		<properties>
+			<property name="newlinesCountBetweenOpenTagAndDeclare" type="integer" value="0"/>
+			<property name="spacesCountAroundEqualsSign" type="integer" value="1"/>
+		</properties>
+	</rule>
+
+	<arg name="basepath" value="."/>
+	<arg name="extensions" value="php"/>
+	<arg name="encoding" value="utf-8"/>
+	<arg value="s"/>
+	<arg value="n"/>
+	<arg value="p"/>
+	<arg name="colors"/>
+	<arg name="parallel" value="80"/>
+	<arg name="cache" value=".phpcs-cache"/>
+
+	<file>src/</file>
+</ruleset>

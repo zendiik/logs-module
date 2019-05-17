@@ -1,0 +1,17 @@
+stages:
+  - test
+
+.phpcode: &phpcode
+  stage: test
+  image: bukj/php7-node-docker-ci:slim72
+  before_script:
+    - composer install --prefer-dist -o
+  cache:
+    paths:
+      - vendor/
+
+code:check:
+  <<: *phpcode
+  script:
+    - vendor/bin/phpcs
+    - vendor/bin/phpstan analyse --level 7 --no-progress -c ./phpstan.neon src/
