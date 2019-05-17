@@ -2,7 +2,6 @@
 
 namespace Netleak\TestPackage\DI;
 
-use Nette\Application\Routers\Route;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Helpers;
