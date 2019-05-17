@@ -1,0 +1,7 @@
+{
+    "name": "netleak/testovaci-composer-package",
+    "description": "Můj testovací balíček pro composer",
+    "require": {
+        "php": "^7.2"
+    }
+}
