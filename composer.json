@@ -23,7 +23,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Netleak\\": "src/"
+			"Netleak\\TestPackage\\": "src/"
 		}
 	},
 	"require-dev": {
