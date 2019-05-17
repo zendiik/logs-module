@@ -16,11 +16,13 @@
 	"minimum-stability": "stable",
 	"require": {
 		"php": "^7.2",
-		"nette/di": "2.4.*"
+		"nette/di": "^2.4",
+		"nette/application": "^2.4",
+		"nette/utils": "^2.5"
 	},
 	"autoload": {
 		"psr-4": {
-			"Netleak\\": "src/"
+			"Netleak\\": "src/TestPackage/"
 		}
 	},
 	"require-dev": {
