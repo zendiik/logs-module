@@ -18,7 +18,8 @@
 		"php": "^7.2",
 		"nette/di": "^2.4",
 		"nette/application": "^2.4",
-		"nette/utils": "^2.5"
+		"nette/utils": "^2.5",
+		"nette/php-generator": "^3.2"
 	},
 	"autoload": {
 		"psr-4": {

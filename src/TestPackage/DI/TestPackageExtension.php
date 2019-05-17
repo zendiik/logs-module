@@ -1,9 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Netleak\DI;
+namespace Netleak\TestPackage\DI;
 
-use Netleak\TestPackage\DI;
-use Nette\Application\IRouter;
+use Netleak\TestPackage\TestRouter;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 
@@ -20,9 +19,9 @@ final class TestPackageExtension extends CompilerExtension {
 		$this->validateConfig($this->defaults);
 		$builder = $this->getContainerBuilder();
 
-		$builder->addDefinition($this->prefix('router'))
+		/*$builder->addDefinition($this->prefix('router'))
 			->setClass(TestRouter::class)
-			->addSetup('append', ['admin/test-log', 'Admin:Log']);
+			->addSetup('append', ['admin/test-log', 'Admin:Log']);*/
 
 		Compiler::loadDefinitions(
 			$builder,
@@ -30,10 +29,7 @@ final class TestPackageExtension extends CompilerExtension {
 		);
 	}
 
-	public function beforeCompile() {
-		$builder = $this->getContainerBuilder();
-
-		$builder->removeDefinition('routing.router');
-		$builder->getDefinition($this->prefix('router'));
+	public function afterCompile(Nette\PhpGenerator\ClassType $class) {
+		$initialize = $class->getMethod('initialize');
 	}
 }

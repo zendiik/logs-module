@@ -4,21 +4,31 @@ namespace Netleak\TestPackage;
 
 use Nette\Application\Routers\Route;
 use Nette\Application\Routers\RouteList;
-use Tracy\Debugger;
 
 class TestRouter {
 
+	/**
+	 * @var RouteList
+	 */
 	private $router;
 
 	public function __construct() {
 		$this->router = new RouteList();
 	}
 
-	public function append($mask, $metadata = [], $flags = 0) {
+	/**
+	 * @param string $mask
+	 * @param string|array<string> $metadata
+	 * @param int $flags
+	 * @return self
+	 */
+	public function append(string $mask, $metadata = [], int $flags = 0): self {
 		$this->router[] = new Route($mask, $metadata, $flags);
+
+		return $this;
 	}
 
-	public function createRouter() {
+	public function createRouter(): RouteList {
 		return $this->router;
 	}
 
