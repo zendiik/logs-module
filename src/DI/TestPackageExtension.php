@@ -2,9 +2,11 @@
 
 namespace Netleak\TestPackage\DI;
 
-use Netleak\TestPackage\TestRouter;
+use Nette\Application\Routers\Route;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Helpers;
+use Nette\PhpGenerator\ClassType;
 
 final class TestPackageExtension extends CompilerExtension {
 
@@ -29,7 +31,17 @@ final class TestPackageExtension extends CompilerExtension {
 		);
 	}
 
-	public function afterCompile(Nette\PhpGenerator\ClassType $class) {
+	public function afterCompile(ClassType $class): void {
 		$initialize = $class->getMethod('initialize');
+		$builder = $this->getContainerBuilder();
+
+		$initialize->addBody($builder->formatPhp(
+			'$this->getService(?)->addRoute(new \Nette\Application\Routers\Route(?, ?));',
+			Helpers::filterArguments([
+				$this->prefix('router'),
+				'admin/test-log',
+				'Admin:Log',
+			])
+		));
 	}
 }
