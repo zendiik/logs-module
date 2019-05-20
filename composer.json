@@ -11,6 +11,7 @@
 	"minimum-stability": "stable",
 	"require": {
 		"php": "^7.2",
+		"ext-zip": "*",
 		"nette/di": "^2.4",
 		"nette/application": "^2.4",
 		"nette/utils": "^2.5",
@@ -23,8 +24,15 @@
 		}
 	},
 	"require-dev": {
+		"tracy/tracy": "^2.6",
 		"phpstan/phpstan": "^0.11",
 		"consistence/coding-standard": "^3.8",
 		"slevomat/coding-standard": "^5.0"
+	},
+	"scripts": {
+		"test": [
+			"phpcs",
+			"phpstan analyze -l 7 -c ./phpstan.neon /src"
+		]
 	}
 }
