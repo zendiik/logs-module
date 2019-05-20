@@ -13,7 +13,7 @@
 				{if $page > 1}
 					<li>
 						<a href="{plink this page => $page-1}{if !empty($filterQueryString)}?{$filterQueryString}{/if}"
-						   class="page-link" title="{_'common.previous'}">&larr;</a>
+						   class="page-link" title="Previous">&larr;</a>
 					</li>
 
 					{for $i = 1; $i <= $extremePagesLimit; $i++}
@@ -41,7 +41,7 @@
 					{/for}
 				{elseif $showAlwaysFirstAndLast}
 					<li class="disabled">
-						<a class="page-link" title="{_'common.previous'}">&larr;</a>
+						<a class="page-link" title="Previous">&larr;</a>
 					</li>
 				{/if}
 
@@ -77,11 +77,11 @@
 
 					<li>
 						<a href="{plink this page => $page+1}{if !empty($filterQueryString)}?{$filterQueryString}{/if}"
-						   class="page-link" title="{_'common.next'}">&rarr;</a>
+						   class="page-link" title="Next">&rarr;</a>
 					</li>
 				{elseif $showAlwaysFirstAndLast}
 					<li class="disabled">
-						<a class="page-link" title="{_'common.next'}">&rarr;</a>
+						<a class="page-link" title="Next">&rarr;</a>
 					</li>
 				{/if}
 			</ul>

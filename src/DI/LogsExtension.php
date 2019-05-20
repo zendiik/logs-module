@@ -2,12 +2,12 @@
 
 namespace Netleak\Logs\DI;
 
-use Netleak\Logs\Logs;
 use Netleak\Logs\Presenters\LogsPresenter;
 use Nette\Application\IPresenterFactory;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Helpers;
 use Nette\PhpGenerator\ClassType;
+use Tracy\Debugger;
 
 final class LogsExtension extends CompilerExtension {
 
@@ -16,18 +16,17 @@ final class LogsExtension extends CompilerExtension {
 	 */
 	private $defaults = [
 		'adminRoute' => 'admin',
-		'appDir' => null,
+		'appDir' => '%appDir%',
+		'tempDir' => '%tempDir%',
 	];
 
 	public function loadConfiguration(): void {
 		$this->validateConfig($this->defaults);
-		// $builder = $this->getContainerBuilder();
+		$builder = $this->getContainerBuilder();
 	}
 
 	public function beforeCompile(): void {
 		$builder = $this->getContainerBuilder();
-
-		new Logs($this->getConfig()['appDir']);
 
 		$builder->getDefinition($builder->getByType(IPresenterFactory::class) ?: 'nette.presenterFactory')
 			->addSetup(

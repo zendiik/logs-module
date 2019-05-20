@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTime;
 use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Presenter;
+use Nette\DI\Container;
 use Nette\Utils\FileSystem;
 use ZipArchive;
 
@@ -20,7 +21,7 @@ class LogsPresenter extends Presenter {
 	public function beforeRender(): void {
 		$notFound = $this->getSession()->getSection('logsFilter')->notFound ?? false;
 
-		foreach ((new TestPresenter())->countLogs(TestPresenter::RETURN_COUNT, null, $notFound) as $key => $countLog) {
+		foreach (LogsPresenter::countLogs(LogsPresenter::RETURN_COUNT, null, $notFound) as $key => $countLog) {
 			$this->template->$key = $countLog;
 		}
 	}
@@ -42,7 +43,7 @@ class LogsPresenter extends Presenter {
 		$this->template->errorHide = $errorHide ? 0 : 1;
 		$this->template->terminalHide = $terminalHide ? 0 : 1;
 
-		$all = $this->countLogs(
+		$all = self::countLogs(
 			self::RETURN_DATA,
 			$page,
 			$notFound,
@@ -63,8 +64,8 @@ class LogsPresenter extends Presenter {
 				$allList[] = [
 					'dateTime' => DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19))->format('<b>d.m.Y</b> <br> H:i:s'),
 					'message' => substr($row['message'], 22),
-					'file' => empty($file) ? null : __DIR__ . '/../../../' . $file[0],
-					'fileContent' => empty($file) ? null : FileSystem::read(__DIR__ . '/../../../log/' . $file[0]),
+					'file' => empty($file) ? null : __DIR__ . '/../../../../../' . $file[0],
+					'fileContent' => empty($file) ? null : FileSystem::read(__DIR__ . '/../../../../../log/' . $file[0]),
 					'type' => $row['type'],
 				];
 			}
@@ -166,7 +167,7 @@ class LogsPresenter extends Presenter {
 	 * @param int|null $limit
 	 * @return array<array<array<string>>|int>
 	 */
-	public function countLogs(
+	public static function countLogs(
 		int $returnType,
 		?int $page = null,
 		bool $notFound = false,
@@ -178,11 +179,11 @@ class LogsPresenter extends Presenter {
 		bool $terminalHide = false,
 		?int $limit = 50
 	): array {
-		$info = __DIR__ . '/../../../log/info.log';
-		$debug = __DIR__ . '/../../../log/debug.log';
-		$exception = __DIR__ . '/../../../log/exception.log';
-		$error = __DIR__ . '/../../../log/error.log';
-		$terminal = __DIR__ . '/../../../log/terminal.log';
+		$info = __DIR__ . '/../../../../../log/info.log';
+		$debug = __DIR__ . '/../../../../../log/debug.log';
+		$exception = __DIR__ . '/../../../../../log/exception.log';
+		$error = __DIR__ . '/../../../../../log/error.log';
+		$terminal = __DIR__ . '/../../../../../log/terminal.log';
 		$all = [];
 
 		if (!$infoHide && file_exists($info) && is_array(file($info))) {
