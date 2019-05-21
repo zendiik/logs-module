@@ -1,11 +1,11 @@
 {
-	"name": "netleak/logs",
+	"name": "oksystem/logs",
 	"description": "Logs extension for OKsystem a.s. website development.",
 	"license": "MIT",
 	"authors": [
 		{
-			"name": "Jan 'Netleak' Ženíšek",
-			"email": "jan.zenisek@outlook.com"
+			"name": "Jan Ženíšek (OKsystem a.s.)",
+			"email": "zenisek@oksystem.cz"
 		}
 	],
 	"minimum-stability": "stable",

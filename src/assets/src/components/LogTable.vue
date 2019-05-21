@@ -142,7 +142,13 @@
 					},
 				],
 				logs: [],
-				types: []
+				types: {
+					"info": true,
+					"debug": true,
+					"exception": true,
+					"terminal": true,
+					"error": true,
+				}
 			}
 		},
 		computed: {
@@ -170,23 +176,23 @@
 			filteredLog() {
 				let result = []
 
-				if (!this.filterInfo) {
+				if (this.filterInfo) {
 					Array.prototype.push.apply(result, this.filterLog('info'))
 				}
 
-				if (!this.filterDebug) {
+				if (this.filterDebug) {
 					Array.prototype.push.apply(result, this.filterLog('debug'))
 				}
 
-				if (!this.filterException) {
+				if (this.filterException) {
 					Array.prototype.push.apply(result, this.filterLog('exception'))
 				}
 
-				if (!this.filterTerminal) {
+				if (this.filterTerminal) {
 					Array.prototype.push.apply(result, this.filterLog('terminal'))
 				}
 
-				if (!this.filterError) {
+				if (this.filterError) {
 					Array.prototype.push.apply(result, this.filterLog('error'))
 				}
 
@@ -245,15 +251,25 @@
 				const initialState = document.querySelector('#__INITIAL_STATE__');
 
 				if (initialState !== null) {
-					this.types = JSON.parse(initialState.innerHTML).types
+					let types = JSON.parse(initialState.innerHTML).types
 
-					this.$store.commit('setFilterInfo', !this.types.info)
-					this.$store.commit('setFilterDebug', !this.types.debug)
-					this.$store.commit('setFilterException', !this.types.exception)
-					this.$store.commit('setFilterTerminal', !this.types.terminal)
-					this.$store.commit('setFilterError', !this.types.error)
+					this.types.info = types.info === undefined ? true : types.info
+					this.types.debug = types.debug === undefined ? true : types.debug
+					this.types.exception = types.exception === undefined ? true : types.exception
+					this.types.terminal = types.terminal === undefined ? true : types.terminal
+					this.types.error = types.error === undefined ? true : types.error
+
+					this.$store.commit('setFilterInfo', this.types.info)
+					this.$store.commit('setFilterDebug', this.types.debug)
+					this.$store.commit('setFilterException', this.types.exception)
+					this.$store.commit('setFilterTerminal', this.types.terminal)
+					this.$store.commit('setFilterError', this.types.error)
 				} else {
-					this.types = []
+					this.types.info = true
+					this.types.debug = true
+					this.types.exception = true
+					this.types.terminal = true
+					this.types.error = true
 				}
 			},
 			getLogs() {

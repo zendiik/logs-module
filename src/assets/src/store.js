@@ -4,13 +4,7 @@ import VuexPersist from 'vuex-persist'
 
 Vue.use(Vuex)
 
-const vuexPersist = new VuexPersist({
-	key: 'logs-table',
-	storage: localStorage
-})
-
 export default new Vuex.Store({
-	plugins: [vuexPersist.plugin],
 	state: {
 		filterInfo: false,
 		filterDebug: false,
@@ -83,5 +77,6 @@ export default new Vuex.Store({
 		toggleFilterError({ commit }) {
 			commit('toggleFilterError')
 		},
-	}
+	},
+	plugins: [new VuexPersist().plugin],
 })
