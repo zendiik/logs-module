@@ -1,5 +1,41 @@
-# Test Composer Packag
+# Logs Module
 
-[![Build](https://gitlab.zendovo.eu/netleak/testovaci-composer-package/badges/master/build.svg)](https://gitlab.zendovo.eu/netleak/testovaci-composer-package/pipelines)
-[![Latest Stable Version](https://poser.pugx.org/netleak/testovaci-composer-package/v/stable)](https://packagist.org/packages/netleak/testovaci-composer-package)
-[![License](https://poser.pugx.org/netleak/testovaci-composer-package/license)](https://packagist.org/packages/netleak/testovaci-composer-package)
+### Instalace
+
+Toto přidejte do `composer.json`:
+```json
+"repositories": [
+	{
+		"type": "vcs",
+		"url": "ssh://git@bitbucket.oksystem.local:7999/web/logs-module.git"
+	}
+],
+```
+
+Poté nad projektem spusťte:
+```bash
+composer require oksystem/logs 
+```
+
+Následně v presenteru vygenerujte komponentu:
+
+```php
+public function createComponentLogs(string $name): void {
+	$logs = new LogsControl(__DIR__ . '/../../../'); // cesta k rootu aplikace 
+	$logs->useLogs = array( // true je automaticky, není povinné
+		'error' => true,
+		'info' => true,
+		'terminal' => true,
+		'debug' => true,
+		'exception' => true
+	);
+	$this->addComponent($logs, $name);
+}
+```
+
+Vytvořte latte soubor a do něj inicializujte control:
+
+```latte
+{block content}
+{control logs}
+```
