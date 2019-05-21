@@ -19,7 +19,7 @@
 			</div>
 			<div class="col-sm-2 col-sm-offset-1">
 				<div class="click panel" :class="filterException ? 'panel-default' : 'panel-warning'" @click="toggleFilterException"
-					v-if="types.exception">
+					 v-if="types.exception">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogException }}</strong></h2>
 						exception.log
@@ -28,7 +28,7 @@
 			</div>
 			<div class="col-sm-2 col-sm-offset-1">
 				<div class="click panel" :class="filterTerminal ? 'panel-default' : 'panel-terminal'" @click="toggleFilterTerminal"
-					v-if="types.terminal">
+					 v-if="types.terminal">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogTerminal }}</strong></h2>
 						terminal.log
@@ -63,9 +63,9 @@
 		<table class="table table-stripped table-bordered table-hover table-condensed">
 			<thead>
 				<tr>
-					<td>Date And Time</td>
-					<td>Description</td>
-					<td></td>
+					<th>Date And Time</th>
+					<th>Description</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -81,7 +81,8 @@
 						{{ log.message }}
 					</td>
 					<td>
-						<a class="logLink" v-if="log.file !== null" @click="loadIframe(log.fileContent)">
+						<a data-toggle="modal" data-target="#iframe" :data-content="log.fileContent" class="logLink" v-if="log.file !== null"
+						   @click="loadIframe(log.fileContent)">
 							<fa-icon icon="file" />
 						</a>
 					</td>
@@ -192,7 +193,7 @@
 				return result
 			},
 			filteredLogPaginated() {
-				let start = (this.currentPage - 1) *this.perPage
+				let start = (this.currentPage - 1) * this.perPage
 
 				return this.filteredLog.slice(start, start + this.perPage)
 			},
@@ -233,11 +234,7 @@
 				this.$store.dispatch('toggleFilterError')
 			},
 			loadIframe(data) {
-				let modal = document.querySelector('#iframe')
-				modal.modal('show')
-				modal.addEventListener('show.bs.modal', () => {
-					document.querySelector('#fileContent').src = 'data:text/html;charset=utf-8,' + escape(data);
-				})
+				document.querySelector('#fileContent').src = 'data:text/html;charset=utf-8,' + escape(data);
 			},
 			filterLog(type) {
 				return this.logs.filter(log => {

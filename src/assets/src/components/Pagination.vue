@@ -5,24 +5,24 @@
 					v-if="paginationLabels.first"
 					:class="`${paginationClasses.li} ${hasFirst ? paginationClasses.liDisable : ''}`"
 			>
-				<button
+				<a
 						@click="first"
 						:disabled="hasFirst"
 						:class="`${paginationClasses.button} ${hasFirst ? paginationClasses.buttonDisable : ''}`"
 						v-html="paginationLabels.first"
-				></button>
+				></a>
 			</li>-->
 
 			<li
 					v-if="paginationLabels.prev"
 					:class="`${paginationClasses.li} ${hasFirst ? paginationClasses.liDisable : ''}`"
 			>
-				<button
+				<a
 						@click="prev"
 						:disabled="hasFirst"
 						:class="`${paginationClasses.button} ${hasFirst ? paginationClasses.buttonDisable : ''}`"
 						v-html="paginationLabels.prev"
-				></button>
+				></a>
 			</li>
 
 			<li
@@ -34,37 +34,37 @@
 				v-if="page.disable"
 				:class="`${paginationClasses.button} ${paginationClasses.buttonDisable}`"
 		>...</span>
-				<button
+				<a
 						v-else
 						@click="goto(page.label)"
 						:class="`${paginationClasses.button} ${page.active ? paginationClasses.buttonActive : ''}`"
 				>
 					{{ page.label }}
-				</button>
+				</a>
 			</li>
 
 			<li
 					v-if="paginationLabels.next"
 					:class="`${paginationClasses.li} ${hasLast ? paginationClasses.liDisable : ''}`"
 			>
-				<button
+				<a
 						@click="next"
 						:disabled="hasLast"
 						:class="`${paginationClasses.button} ${hasLast ? paginationClasses.buttonDisable : ''}`"
 						v-html="paginationLabels.next"
-				></button>
+				></a>
 			</li>
 
 			<!--<li
 					v-if="paginationLabels.last"
 					:class="`${paginationClasses.li} ${hasLast ? paginationClasses.liDisable : ''}`"
 			>
-				<button
+				<a
 						@click="last"
 						:disabled="hasLast"
 						:class="`${paginationClasses.button} ${hasLast ? paginationClasses.buttonDisable : ''}`"
 						v-html="paginationLabels.last"
-				></button>
+				></a>
 			</li>-->
 		</ul>
 	</nav>
