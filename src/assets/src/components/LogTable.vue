@@ -9,7 +9,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2 col-sm-offset-1">
+			<div class="col-sm-2">
 				<div class="click panel" :class="filterDebug ? 'panel-default' : 'panel-success'" @click="toggleFilterDebug" v-if="types.debug">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogDebug }}</strong></h2>
@@ -17,7 +17,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2 col-sm-offset-1">
+			<div class="col-sm-2">
 				<div class="click panel" :class="filterException ? 'panel-default' : 'panel-warning'" @click="toggleFilterException"
 					 v-if="types.exception">
 					<div class="panel-heading text-center filter" data-type="info">
@@ -26,7 +26,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2 col-sm-offset-1">
+			<div class="col-sm-2">
 				<div class="click panel" :class="filterTerminal ? 'panel-default' : 'panel-terminal'" @click="toggleFilterTerminal"
 					 v-if="types.terminal">
 					<div class="panel-heading text-center filter" data-type="info">
@@ -35,7 +35,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2 col-sm-offset-1">
+			<div class="col-sm-2">
 				<div class="click panel" :class="filterError ? 'panel-default' : 'panel-danger'" @click="toggleFilterError" v-if="types.error">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogError }}</strong></h2>
