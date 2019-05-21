@@ -1,42 +1,40 @@
 <template>
 	<div class="log-table">
-		<div class="row">
-			<div class="col-sm-2 col-sm-offset-1">
-				<div class="click panel" :class="filterInfo ? 'panel-default' : 'panel-info'" @click="toggleFilterInfo" v-if="types.info">
+		<div class="row-f">
+			<div class="column" v-if="types.info">
+				<div class="click panel" :class="filterInfo ? 'panel-info' : 'panel-default'" @click="toggleFilterInfo">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogInfo }}</strong></h2>
 						info.log
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2">
-				<div class="click panel" :class="filterDebug ? 'panel-default' : 'panel-success'" @click="toggleFilterDebug" v-if="types.debug">
+			<div class="column" v-if="types.debug">
+				<div class="click panel" :class="filterDebug ? 'panel-success' : 'panel-default'" @click="toggleFilterDebug">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogDebug }}</strong></h2>
 						debug.log
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2">
-				<div class="click panel" :class="filterException ? 'panel-default' : 'panel-warning'" @click="toggleFilterException"
-					 v-if="types.exception">
+			<div class="column" v-if="types.exception">
+				<div class="click panel" :class="filterException ? 'panel-warning' : 'panel-default'" @click="toggleFilterException">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogException }}</strong></h2>
 						exception.log
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2">
-				<div class="click panel" :class="filterTerminal ? 'panel-default' : 'panel-terminal'" @click="toggleFilterTerminal"
-					 v-if="types.terminal">
+			<div class="column" v-if="types.terminal">
+				<div class="click panel" :class="filterTerminal ? 'panel-terminal' : 'panel-default'" @click="toggleFilterTerminal">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogTerminal }}</strong></h2>
 						terminal.log
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-2">
-				<div class="click panel" :class="filterError ? 'panel-default' : 'panel-danger'" @click="toggleFilterError" v-if="types.error">
+			<div class="column" v-if="types.error">
+				<div class="click panel" :class="filterError ? 'panel-danger' : 'panel-default'" @click="toggleFilterError">
 					<div class="panel-heading text-center filter" data-type="info">
 						<h2><strong>{{ countLogError }}</strong></h2>
 						error.log
@@ -127,20 +125,6 @@
 					prev: '&larr;',
 					next: '&rarr;'
 				},
-				fields: [
-					{
-						key: 'dateTime',
-						label: 'Date And Time'
-					},
-					{
-						key: 'message',
-						label: 'Description'
-					},
-					{
-						key: 'file',
-						label: ''
-					},
-				],
 				logs: [],
 				types: {
 					"info": true,
@@ -289,13 +273,13 @@
 	@brand-lightest: #a8f4bf;
 	@brand-primary: #009645;
 
-	.bg-terminal {
+	.panel-terminal {
 		background-color: @brand-lightest;
 		border-color: @brand-lighter;
 		color: @brand-primary;
 	}
 
-	.badge-terminal {
+	.label-terminal {
 		background-color: @brand-lighter;
 		color: @brand-primary;
 	}
@@ -306,5 +290,16 @@
 
 	.click {
 		cursor: pointer;
+	}
+
+	.row-f {
+		display: flex;
+		justify-content: center;
+	}
+
+	.column {
+		width: 12%;
+		margin-right: 1%;
+		text-align: center;
 	}
 </style>
