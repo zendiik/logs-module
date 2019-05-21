@@ -12,6 +12,7 @@
 	"require": {
 		"php": "^7.2",
 		"ext-zip": "*",
+		"ext-json": "*",
 		"nette/di": "^2.4",
 		"nette/application": "^2.4",
 		"nette/utils": "^2.5",

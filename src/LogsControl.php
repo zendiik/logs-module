@@ -42,7 +42,8 @@ class LogsControl extends Control {
 	public function render(): void {
 		$template = $this->getTemplate();
 
-		$template->logs = $this->readLogs();
+		$template->types = json_encode($this->useLogs);
+		$template->logs = json_encode($this->readLogs());
 		$template->setFile(__DIR__ . '/templates/logs.latte');
 		$template->render();
 	}
