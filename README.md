@@ -39,3 +39,5 @@ Vytvořte latte soubor a do něj inicializujte control:
 {block content}
 {control logs}
 ```
+
+##### Nakonec extrahujte obsah vendor/oksystem/logs/src/assets.zip do složky www
