@@ -135,7 +135,7 @@ class LogsControl extends Control {
 				preg_match('/(exception--[\S]+.html)/', $row['message'], $file);
 
 				$allList[] = [
-					'dateTime' => DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19))->format("<b>d.m.Y</b> <b\\r> H:i:s"),
+					'dateTime' => DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19))->format('d.m.Y H:i:s'),
 					'message' => substr($row['message'], 22),
 					'file' => empty($file) ? null : $this->logPath . '/' . $file[0],
 					'fileContent' => empty($file) ? null : FileSystem::read($this->logPath . '/' . $file[0]),

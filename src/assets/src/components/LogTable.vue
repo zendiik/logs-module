@@ -68,7 +68,7 @@
 			</thead>
 			<tbody>
 				<tr v-for="(log, index) in filteredLogPaginated" :key="index">
-					<td v-html="log.dateTime"></td>
+					<td v-html="$options.filters.date(log.dateTime)"></td>
 					<td>
 						<span class="label label-danger" v-if="log.type === 'error'">{{ log.type }}</span>
 						<span class="label label-terminal" v-else-if="log.type === 'terminal'">{{ log.type }}</span>
@@ -106,6 +106,8 @@
 
 <script>
 	import Pagination from '@/components/Pagination'
+	import momentjs from 'moment'
+
 	const initialState = document.querySelector('#__INITIAL_STATE__');
 
 	export default {
@@ -186,7 +188,11 @@
 			filteredLogPaginated() {
 				let start = (this.currentPage - 1) * this.perPage
 
-				return this.filteredLog.slice(start, start + this.perPage)
+				return this.filteredLog
+					.sort((a, b) => {
+						return this.momentDate(b.dateTime) - this.momentDate(a.dateTime)
+					})
+					.slice(start, start + this.perPage)
 			},
 			countLogInfo() {
 				return this.filterLog('info').length
@@ -208,7 +214,15 @@
 			this.getLogs()
 			this.getTypes()
 		},
+		filters: {
+			date(value) {
+				return momentjs.utc(value, 'DD.MM.YYYY HH:mm:ss').format('<b>DD.MM.YYYY</b><br>HH:mm:ss')
+			}
+		},
 		methods: {
+			momentDate(dateTime) {
+				return momentjs.utc(dateTime, 'DD.MM.YYYY HH:mm:ss').toDate()
+			},
 			toggleFilterInfo() {
 				this.$store.dispatch('toggleFilterInfo')
 			},
