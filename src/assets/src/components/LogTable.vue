@@ -106,6 +106,7 @@
 
 <script>
 	import Pagination from '@/components/Pagination'
+	const initialState = document.querySelector('#__INITIAL_STATE__');
 
 	export default {
 		name: 'LogTable',
@@ -232,8 +233,6 @@
 				})
 			},
 			getTypes() {
-				const initialState = document.querySelector('#__INITIAL_STATE__');
-
 				if (initialState !== null) {
 					let types = JSON.parse(initialState.innerHTML).types
 
@@ -257,8 +256,6 @@
 				}
 			},
 			getLogs() {
-				const initialState = document.querySelector('#__INITIAL_STATE__');
-
 				if (initialState !== null) {
 					this.logs = JSON.parse(initialState.innerHTML).logs
 				} else {
