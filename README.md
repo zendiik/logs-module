@@ -4,6 +4,9 @@
 
 Toto přidejte do `composer.json`:
 ```json
+"scripts": {
+	"post-autoload-dump": "npm install git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git"
+},
 "repositories": [
 	{
 		"type": "vcs",
@@ -38,10 +41,4 @@ Vytvořte latte soubor a do něj inicializujte control:
 ```latte
 {block content}
 {control logs}
-```
-
-Nakonec spusťte:
-
-```bash
-npm i git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git --save
 ```

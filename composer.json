@@ -30,9 +30,6 @@
 		"slevomat/coding-standard": "^5.0"
 	},
 	"scripts": {
-		"post-install-cmd": [
-			"npm install git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git"
-		],
 		"test": [
 			"phpcs",
 			"phpstan analyze -l 7 -c ./phpstan.neon /src"
