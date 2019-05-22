@@ -2,7 +2,7 @@
 
 ### Instalace
 
-Toto přidejte do `composer.json`:
+Přidejte do `composer.json`:
 ```json
 "scripts": {
 	"post-autoload-dump": "npm install git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git"
@@ -15,7 +15,7 @@ Toto přidejte do `composer.json`:
 ],
 ```
 
-Poté nad projektem spusťte:
+Nad projektem spusťte:
 ```bash
 composer require oksystem/logs 
 ```
