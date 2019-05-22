@@ -1,0 +1,16 @@
+{
+	"name": "@oksystem/logs-module",
+	"version": "1.0.0",
+	"author": {
+		"name": "Jan Ženíšek (OKsystem a.s.)",
+		"email": "zenisek@oksystem.cz"
+	},
+	"description": "Logs extension for OKsystem a.s. website development.",
+	"license": "MIT",
+	"dependencies": {
+		"gently-copy": "^2.3.1"
+	},
+	"scripts": {
+		"postinstall": "node ./post-install.js"
+	}
+}
