@@ -79,8 +79,7 @@
 						{{ log.message }}
 					</td>
 					<td>
-						<a data-toggle="modal" data-target="#iframe" :data-content="log.fileContent" class="logLink" v-if="log.file !== null"
-						   @click="loadIframe(log.fileContent)">
+						<a data-toggle="modal" data-target="#iframe" class="logLink" v-if="log.file !== null" @click="loadIframe(log.fileContent)">
 							<fa-icon icon="file" />
 						</a>
 					</td>
@@ -189,6 +188,7 @@
 				let start = (this.currentPage - 1) * this.perPage
 
 				return this.filteredLog
+					.slice()
 					.sort((a, b) => {
 						return this.momentDate(b.dateTime) - this.momentDate(a.dateTime)
 					})

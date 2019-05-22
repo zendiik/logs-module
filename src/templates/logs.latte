@@ -1,9 +1,14 @@
-<h1>Logs</h1>
+<h1 n:block="title">Logy</h1>
 
-<link href=/assets/css/app.104c3fb0.css rel=preload as=style>
-<link href=/assets/js/app.72ffdf6f.js rel=preload as=script>
+<div class="btn-group pull-right-btn" n:if="$logs !== '[]'">
+	<a n:href="exportLogs" class="btn btn-warning ajax"><span class="fa fa-download"></span> Exportovat logy</a>
+	<a n:href="deleteLogs" class="btn btn-success ajax"><span class="fa fa-trash"></span> Smazat log</a>
+</div>
+
+<link href=/assets/css/app.96583049.css rel=preload as=style>
+<link href=/assets/js/app.65dbdfd6.js rel=preload as=script>
 <link href=/assets/js/chunk-vendors.9231627f.js rel=preload as=script>
-<link href=/assets/css/app.104c3fb0.css rel=stylesheet>
+<link href=/assets/css/app.96583049.css rel=stylesheet>
 
 <div id=app></div>
 
@@ -14,4 +19,4 @@
 	}
 </script>
 <script src=/assets/js/chunk-vendors.9231627f.js></script>
-<script src=/assets/js/app.72ffdf6f.js></script>
+<script src=/assets/js/app.65dbdfd6.js></script>

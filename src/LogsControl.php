@@ -2,16 +2,24 @@
 
 namespace Netleak\Logs;
 
+use Carbon\Carbon;
 use DateTime;
+use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Control;
 use Nette\ComponentModel\IContainer;
 use Nette\Utils\FileSystem;
+use ZipArchive;
 
 class LogsControl extends Control {
 
 	public const RETURN_COUNT = 1;
 
 	public const RETURN_DATA = 2;
+
+	/**
+	 * @var string|null
+	 */
+	private $rootPath;
 
 	/**
 	 * @var string|null
@@ -35,6 +43,7 @@ class LogsControl extends Control {
 			$parent->addComponent($this, $name);
 		}
 
+		$this->rootPath = $rootPath;
 		$this->logPath = $rootPath . '/log';
 		$this->tempPath = $rootPath . '/temp';
 	}
@@ -145,6 +154,51 @@ class LogsControl extends Control {
 		}
 
 		return $allList;
+	}
+
+	public function handleExportLogs(): void {
+		$logDirectory = $this->logPath . '/';
+		$zipName = 'logs_' . Carbon::now()->format('d-m-Y_h-i-s') . '.zip';
+		$zipPath = $this->tempPath . '/cache/' . $zipName;
+		$logs = scandir($logDirectory, SCANDIR_SORT_NONE);
+
+		if (is_array($logs)) {
+			unset($logs[0], $logs[1]);
+		}
+
+		if (is_array($logs)) {
+			$zip = new ZipArchive();
+			$zip->open($zipPath, ZipArchive::CREATE);
+
+			foreach ($logs as $log) {
+				$zip->addFile($logDirectory . $log, $log);
+			}
+
+			$zip->close();
+		}
+
+		$this->getPresenter()->sendResponse(new FileResponse($zipPath, $zipName));
+	}
+
+	public function handleDeleteLogs(): void {
+		$check = shell_exec('echo $SHELL');
+		$delLogs = [
+			'win' => 'del /q log\*',
+			'unix' => 'rm -rf log/*',
+		];
+
+		$delLogs = $check === "\$SHELL\n"
+			? $delLogs['win']
+			: $delLogs['unix'];
+
+		chdir($this->rootPath);
+
+		exec($delLogs . ' 2>&1', $output);
+
+		$template = $this->getTemplate();
+		$template->logs = json_encode($this->readLogs());
+
+		$this->redirect('this');
 	}
 
 }
