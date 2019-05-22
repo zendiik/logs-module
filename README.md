@@ -40,4 +40,8 @@ Vytvořte latte soubor a do něj inicializujte control:
 {control logs}
 ```
 
-##### Nakonec extrahujte obsah vendor/oksystem/logs/src/assets.zip do složky www
+Nakonec spusťte:
+
+```bash
+npm i git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git --save
+```

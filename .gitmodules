@@ -1,3 +1,3 @@
 [submodule "src/assets/dist"]
 	path = src/assets/dist
-	url = git@gitlab.zendovo.eu:netleak/logs-module-assets.git
+	url = ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git
