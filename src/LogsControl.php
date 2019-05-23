@@ -36,7 +36,7 @@ class LogsControl extends Control {
 	 */
 	public $useLogs = [];
 
-	public function __construct(string $rootPath, IContainer $parent = null, $name = null) {
+	public function __construct(string $rootPath, ?IContainer $parent = null, ?string $name = null) {
 		parent::__construct();
 
 		if ($parent !== null) {
@@ -58,7 +58,7 @@ class LogsControl extends Control {
 	}
 
 	/**
-	 * @return array<array<array<string>>|int>
+	 * @return array<int, array<string, string|null>>
 	 */
 	public function readLogs(): array {
 		$info = $this->logPath . '/info.log';
@@ -142,12 +142,13 @@ class LogsControl extends Control {
 		if (is_array($all)) {
 			foreach ($all as $row) {
 				preg_match('/(exception--[\S]+.html)/', $row['message'], $file);
+				$dateTime = DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19));
 
 				$allList[] = [
-					'dateTime' => DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19))->format('d.m.Y H:i:s'),
+					'dateTime' => $dateTime ? $dateTime->format('d.m.Y H:i:s') : 'datum neexistuje!',
 					'message' => substr($row['message'], 22),
-					'file' => empty($file) ? null : $this->logPath . '/' . $file[0],
-					'fileContent' => empty($file) ? null : FileSystem::read($this->logPath . '/' . $file[0]),
+					'file' => empty($file) || !file_exists($file[0]) ? null : $this->logPath . '/' . $file[0],
+					'fileContent' => empty($file) || !file_exists($file[0]) ? null : FileSystem::read($this->logPath . '/' . $file[0]),
 					'type' => $row['type'],
 				];
 			}
@@ -191,12 +192,14 @@ class LogsControl extends Control {
 			? $delLogs['win']
 			: $delLogs['unix'];
 
-		chdir($this->rootPath);
+		if ($this->rootPath !== null) {
+			chdir($this->rootPath);
 
-		exec($delLogs . ' 2>&1', $output);
+			exec($delLogs . ' 2>&1', $output);
 
-		$template = $this->getTemplate();
-		$template->logs = json_encode($this->readLogs());
+			$template = $this->getTemplate();
+			$template->logs = json_encode($this->readLogs());
+		}
 
 		$this->redirect('this');
 	}

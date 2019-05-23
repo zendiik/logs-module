@@ -1,2 +1,5 @@
 parameters:
 	bootstrap: %rootDir%/../../../phpstan-bootstrap.php
+	ignoreErrors:
+		- '#Access to an undefined property Nette\\Application\\UI\\ITemplate::(\$\w).#'
+		- '#Cannot call method sendResponse\(\) on Nette\\Application\\UI\\Presenter\|null.#'

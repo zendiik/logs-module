@@ -1,8 +1,8 @@
 <h1 n:block="title">Logy</h1>
 
 <div class="btn-group pull-right-btn" n:if="$logs !== '[]'">
-	<a n:href="exportLogs" class="btn btn-warning ajax"><span class="fa fa-download"></span> Exportovat logy</a>
-	<a n:href="deleteLogs" class="btn btn-success ajax"><span class="fa fa-trash"></span> Smazat log</a>
+	<a n:href="exportLogs!" class="btn btn-warning"><span class="fa fa-download"></span> Exportovat logy</a>
+	<a n:href="deleteLogs!" class="btn btn-success"><span class="fa fa-trash"></span> Smazat log</a>
 </div>
 
 <link href=/assets/css/app.96583049.css rel=preload as=style>
@@ -18,5 +18,5 @@
 		"logs": {{$logs|noescape}}
 	}
 </script>
-<script src=/assets/js/chunk-vendors.9231627f.js></script>
-<script src=/assets/js/app.65dbdfd6.js></script>
+<script src=/assets/js/chunk-vendors.9231627f.js n:nonce></script>
+<script src=/assets/js/app.65dbdfd6.js n:nonce></script>
