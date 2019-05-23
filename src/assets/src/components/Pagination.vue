@@ -1,18 +1,6 @@
 <template>
 	<nav aria-label="Pagination" class="text-center">
 		<ul :class="paginationClasses.ul">
-			<!--<li
-					v-if="paginationLabels.first"
-					:class="`${paginationClasses.li} ${hasFirst ? paginationClasses.liDisable : ''}`"
-			>
-				<a
-						@click="first"
-						:disabled="hasFirst"
-						:class="`${paginationClasses.button} ${hasFirst ? paginationClasses.buttonDisable : ''}`"
-						v-html="paginationLabels.first"
-				></a>
-			</li>-->
-
 			<li
 					v-if="paginationLabels.prev"
 					:class="`${paginationClasses.li} ${hasFirst ? paginationClasses.liDisable : ''}`"
@@ -54,18 +42,6 @@
 						v-html="paginationLabels.next"
 				></a>
 			</li>
-
-			<!--<li
-					v-if="paginationLabels.last"
-					:class="`${paginationClasses.li} ${hasLast ? paginationClasses.liDisable : ''}`"
-			>
-				<a
-						@click="last"
-						:disabled="hasLast"
-						:class="`${paginationClasses.button} ${hasLast ? paginationClasses.buttonDisable : ''}`"
-						v-html="paginationLabels.last"
-				></a>
-			</li>-->
 		</ul>
 	</nav>
 </template>
@@ -159,11 +135,6 @@
 			}
 		},
 		methods: {
-			first() {
-				if (!this.hasFirst) {
-					this.$emit('input', 1)
-				}
-			},
 			prev() {
 				if (!this.hasFirst) {
 					this.$emit('input', (this.value - 1))
@@ -177,15 +148,19 @@
 					this.$emit('input', (this.value + 1))
 				}
 			},
-			last() {
-				if (!this.hasLast) {
-					this.$emit('input', this.pageCount)
-				}
-			},
 		}
 	}
 </script>
 
 <style scoped>
+	a:hover {
+		cursor: pointer;
+	}
 
+	a {
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
 </style>

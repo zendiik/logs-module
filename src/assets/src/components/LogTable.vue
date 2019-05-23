@@ -56,9 +56,11 @@
 				:page-count="pages"
 				:classes="bootstrapPaginationClasses"
 				:labels="customLabels"
+				@input="isLoading = true"
+				@change="isLoading = false"
 		></Pagination>
 
-		<table class="table table-stripped table-bordered table-hover table-condensed">
+		<table class="table table-stripped table-bordered table-hover table-condensed" :class="{ loading: isLoading }">
 			<thead>
 				<tr>
 					<th>Date And Time</th>
@@ -92,6 +94,8 @@
 				:page-count="pages"
 				:classes="bootstrapPaginationClasses"
 				:labels="customLabels"
+				@input="isLoading = true"
+				@change="isLoading = false"
 		></Pagination>
 
 		<div class="modal fade" tabindex="-1" role="dialog" id="iframe" aria-labelledby="myLargeModalLabel">
@@ -116,6 +120,7 @@
 		},
 		data() {
 			return {
+				isLoading: false,
 				perPage: 20,
 				currentPage: 1,
 				bootstrapPaginationClasses: {
@@ -182,17 +187,14 @@
 					Array.prototype.push.apply(result, this.filterLog('error'))
 				}
 
-				return result
+				return result.slice().sort((a, b) => {
+					return this.momentDate(b.dateTime) - this.momentDate(a.dateTime)
+				})
 			},
 			filteredLogPaginated() {
 				let start = (this.currentPage - 1) * this.perPage
 
-				return this.filteredLog
-					.slice()
-					.sort((a, b) => {
-						return this.momentDate(b.dateTime) - this.momentDate(a.dateTime)
-					})
-					.slice(start, start + this.perPage)
+				return this.filteredLog.slice(start, start + this.perPage)
 			},
 			countLogInfo() {
 				return this.filterLog('info').length
@@ -224,18 +226,23 @@
 				return momentjs.utc(dateTime, 'DD.MM.YYYY HH:mm:ss').toDate()
 			},
 			toggleFilterInfo() {
+				this.currentPage = 1
 				this.$store.dispatch('toggleFilterInfo')
 			},
 			toggleFilterDebug() {
+				this.currentPage = 1
 				this.$store.dispatch('toggleFilterDebug')
 			},
 			toggleFilterException() {
+				this.currentPage = 1
 				this.$store.dispatch('toggleFilterException')
 			},
 			toggleFilterTerminal() {
+				this.currentPage = 1
 				this.$store.dispatch('toggleFilterTerminal')
 			},
 			toggleFilterError() {
+				this.currentPage = 1
 				this.$store.dispatch('toggleFilterError')
 			},
 			loadIframe(data) {
@@ -273,9 +280,10 @@
 				if (initialState !== null) {
 					this.logs = JSON.parse(initialState.innerHTML).logs
 				} else {
+					// this.logs = require('../../public/logs.json')
 					this.logs = []
 				}
-			}
+			},
 		},
 	}
 </script>
@@ -312,5 +320,23 @@
 		width: 12%;
 		margin-right: 1%;
 		text-align: center;
+	}
+
+	.loading > tbody {
+		position: relative;
+		filter: blur(3px);
+
+		&::after {
+			position: absolute;
+			content: url('../../public/loader.svg');
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: rgba(255, 255, 255, 0.9);
+		}
 	}
 </style>
