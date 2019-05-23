@@ -253,7 +253,7 @@
 					this.types.info = types.info === undefined ? true : types.info
 					this.types.debug = types.debug === undefined ? true : types.debug
 					this.types.exception = types.exception === undefined ? true : types.exception
-					this.types.terminal = types.terminal === undefined ? true : types.terminal
+					this.types.terminal = types.terminal === undefined ? false : types.terminal
 					this.types.error = types.error === undefined ? true : types.error
 
 					this.$store.commit('setFilterInfo', this.types.info)
@@ -265,7 +265,7 @@
 					this.types.info = true
 					this.types.debug = true
 					this.types.exception = true
-					this.types.terminal = true
+					this.types.terminal = false
 					this.types.error = true
 				}
 			},

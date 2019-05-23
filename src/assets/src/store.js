@@ -9,7 +9,7 @@ export default new Vuex.Store({
 		filterInfo: false,
 		filterDebug: false,
 		filterException: false,
-		filterTerminal: false,
+		filterTerminal: true,
 		filterError: false,
 	},
 	getters: {
