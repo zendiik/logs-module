@@ -1,5 +1,5 @@
 <template>
-	<div class="log-table">
+	<div class="log-table" v-cloak>
 		<div class="row-f">
 			<div class="column" v-if="types.info">
 				<div class="click panel" :class="filterInfo ? 'panel-info' : 'panel-default'" @click="toggleFilterInfo">
@@ -66,7 +66,7 @@
 					<th></th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody :class="{'loading': loadingData}">
 				<tr v-for="(log, index) in filteredLogPaginated" :key="index">
 					<td v-html="$options.filters.date(log.dateTime)"></td>
 					<td>
@@ -116,6 +116,7 @@
 		},
 		data() {
 			return {
+				loadingData: false,
 				perPage: 20,
 				currentPage: 1,
 				bootstrapPaginationClasses: {
@@ -213,30 +214,48 @@
 		},
 		filters: {
 			date(value) {
-				return momentjs.utc(value, 'DD.MM.YYYY HH:mm:ss').format('<b>DD.MM.YYYY</b><br>HH:mm:ss')
+				return momentjs.utc(value, 'DD.MM.YYYY HH:mm:ss').format('<b>DD.MM.YYYY</b> HH:mm:ss')
+			}
+		},
+		watch: {
+			filteredLogPaginated() {
+				this.loadingData = false
 			}
 		},
 		methods: {
+			sleep(ms) {
+				return new Promise(resolve => setTimeout(resolve, ms))
+			},
 			momentDate(dateTime) {
 				return momentjs.utc(dateTime, 'DD.MM.YYYY HH:mm:ss').toDate()
 			},
 			toggleFilterInfo() {
+				this.loadingData = true
+
 				this.currentPage = 1
 				this.$store.dispatch('toggleFilterInfo')
 			},
 			toggleFilterDebug() {
+				this.loadingData = true
+
 				this.currentPage = 1
 				this.$store.dispatch('toggleFilterDebug')
 			},
 			toggleFilterException() {
+				this.loadingData = true
+
 				this.currentPage = 1
 				this.$store.dispatch('toggleFilterException')
 			},
 			toggleFilterTerminal() {
+				this.loadingData = true
+
 				this.currentPage = 1
 				this.$store.dispatch('toggleFilterTerminal')
 			},
 			toggleFilterError() {
+				this.loadingData = true
+
 				this.currentPage = 1
 				this.$store.dispatch('toggleFilterError')
 			},
@@ -286,6 +305,67 @@
 	@brand-lighter: #9FE9C1;
 	@brand-lightest: #a8f4bf;
 	@brand-primary: #009645;
+
+	.size(@width; @height) {
+		width: @width;
+		height: @height;
+	}
+
+	.loading {
+		position: relative;
+		overflow: hidden; /* aby nepřeteklo u skrtých a minimalizovaných snippetů */
+		&:after {
+			position: absolute;
+			display: block;
+			z-index: 10;
+			content: "";
+			top: 20vh;
+			left: 50%;
+			margin-left: -25px;
+			//margin-top: -25px;
+			.size(50px, 50px);
+			background-image: url("../../public/puff.svg");
+			background-position: center center;
+			background-size: cover;
+		}
+		&:before {
+			position: absolute;
+			display: block;
+			z-index: 10;
+			content: "";
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			.size(100%, 100%);
+			background-color: rgba(0, 128, 255, 0.7);
+		}
+	}
+
+	[v-cloak] > * { display: none; }
+	[v-cloak]::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		z-index: 1;
+		margin: -75px 0 0 -75px;
+		border: 16px solid #f3f3f3;
+		border-radius: 50%;
+		border-top: 16px solid #3498db;
+		width: 120px;
+		height: 120px;
+		-webkit-animation: spin 2s linear infinite;
+		animation: spin 2s linear infinite;
+	}
+	@-webkit-keyframes spin {
+		0% { -webkit-transform: rotate(0deg); }
+		100% { -webkit-transform: rotate(360deg); }
+	}
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
 
 	.panel-terminal {
 		background-color: @brand-lightest;

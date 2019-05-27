@@ -32,15 +32,24 @@ class LogsControl extends Control {
 	private $tempPath;
 
 	/**
+	 * @var string|null
+	 */
+	private $publicPath = '/';
+
+	/**
 	 * @var array<string>
 	 */
 	public $useLogs = [];
 
-	public function __construct(string $rootPath, ?IContainer $parent = null, ?string $name = null) {
+	public function __construct(string $rootPath, ?string $publicPath = null, ?IContainer $parent = null, ?string $name = null) {
 		parent::__construct();
 
 		if ($parent !== null) {
 			$parent->addComponent($this, $name);
+		}
+
+		if ($publicPath !== null) {
+			$this->publicPath = $publicPath;
 		}
 
 		$this->rootPath = $rootPath;
@@ -51,6 +60,7 @@ class LogsControl extends Control {
 	public function render(): void {
 		$template = $this->getTemplate();
 
+		$template->publicPath = $this->publicPath;
 		$template->types = json_encode($this->useLogs);
 		$template->logs = json_encode($this->readLogs());
 		$template->setFile(__DIR__ . '/templates/logs.latte');
