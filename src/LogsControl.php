@@ -37,7 +37,7 @@ class LogsControl extends Control {
 	private $publicPath = '/';
 
 	/**
-	 * @var array<string>
+	 * @var array<string, true>
 	 */
 	public $useLogs = [];
 
