@@ -24,7 +24,10 @@ Následně v presenteru vygenerujte komponentu:
 
 ```php
 public function createComponentLogs(string $name): void {
-	$logs = new LogsControl(__DIR__ . '/../../../'); // cesta k rootu aplikace 
+	$logs = new LogsControl(__DIR__ . '/../../../'); // cesta k rootu aplikace
+
+	$logs->publicPath = '/www'; // '/' je automatický prefix veřejné cesty k assetům, pokud máte jiný nastavte proměnnou
+
 	$logs->useLogs = array( // true je automaticky, není povinné
 		'error' => true,
 		'info' => true,
@@ -32,7 +35,8 @@ public function createComponentLogs(string $name): void {
 		'debug' => true,
 		'exception' => true
 	);
-	$this->addComponent($logs, $name);
+
+    $this->addComponent($logs, $name);
 }
 ```
 
