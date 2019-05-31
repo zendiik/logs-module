@@ -146,7 +146,6 @@ class LogsControl extends Control {
 			$all = array_merge($all, $errors);
 		}
 
-		rsort($all);
 		$allList = [];
 
 		if (is_array($all)) {
