@@ -26,7 +26,7 @@ Následně v presenteru vygenerujte komponentu:
 public function createComponentLogs(string $name): void {
 	$logs = new LogsControl(__DIR__ . '/../../../', '/'); // cesta k rootu aplikace, '/' je automatický prefix veřejné cesty k assetům
 
-	// pokud chcete logování terminal.log či warning.log
+	// pokud chcete logování terminal.log či warning.log 
 	// zbytek je automaticky zobrazen
 	// pro vypnutí stačí přidat řádek s false hodnotou (eg. `'error' => false`)
 	$logs->useLogs = array(
