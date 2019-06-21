@@ -10,6 +10,7 @@ export default new Vuex.Store({
 		filterDebug: false,
 		filterException: false,
 		filterTerminal: true,
+		filterWarning: true,
 		filterError: false,
 	},
 	getters: {
@@ -24,6 +25,9 @@ export default new Vuex.Store({
 		},
 		filterTerminal: state => {
 			return state.filterTerminal
+		},
+		filterWarning: state => {
+			return state.filterWarning
 		},
 		filterError: state => {
 			return state.filterError
@@ -42,6 +46,9 @@ export default new Vuex.Store({
 		toggleFilterTerminal(state) {
 			state.filterTerminal = !state.filterTerminal
 		},
+		toggleFilterWarning(state) {
+			state.filterWarning = !state.filterWarning
+		},
 		toggleFilterError(state) {
 			state.filterError = !state.filterError
 		},
@@ -56,6 +63,9 @@ export default new Vuex.Store({
 		},
 		setFilterTerminal(state, terminal) {
 			state.filterTerminal = terminal
+		},
+		setFilterWarning(state, warning) {
+			state.filterWarning = warning
 		},
 		setFilterError(state, error) {
 			state.filterError = error
@@ -73,6 +83,9 @@ export default new Vuex.Store({
 		},
 		toggleFilterTerminal({ commit }) {
 			commit('toggleFilterTerminal')
+		},
+		toggleFilterWarning({ commit }) {
+			commit('toggleFilterWarning')
 		},
 		toggleFilterError({ commit }) {
 			commit('toggleFilterError')

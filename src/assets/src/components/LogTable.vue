@@ -33,6 +33,14 @@
 					</div>
 				</div>
 			</div>
+			<div class="column" v-if="types.warning">
+				<div class="click panel" :class="filterWarning ? 'panel-warning' : 'panel-default'" @click="toggleFilterWarning">
+					<div class="panel-heading text-center filter" data-type="info">
+						<h2><strong>{{ countLogWarning }}</strong></h2>
+						warning.log
+					</div>
+				</div>
+			</div>
 			<div class="column" v-if="types.error">
 				<div class="click panel" :class="filterError ? 'panel-danger' : 'panel-default'" @click="toggleFilterError">
 					<div class="panel-heading text-center filter" data-type="info">
@@ -157,6 +165,9 @@
 			filterTerminal() {
 				return this.$store.getters.filterTerminal
 			},
+			filterWarning() {
+				return this.$store.getters.filterWarning
+			},
 			filterError() {
 				return this.$store.getters.filterError
 			},
@@ -177,6 +188,10 @@
 
 				if (this.filterTerminal) {
 					Array.prototype.push.apply(result, this.filterLog('terminal'))
+				}
+
+				if (this.filterWarning) {
+					Array.prototype.push.apply(result, this.filterLog('warning'))
 				}
 
 				if (this.filterError) {
@@ -203,6 +218,9 @@
 			},
 			countLogTerminal() {
 				return this.filterLog('terminal').length
+			},
+			countLogWarning() {
+				return this.filterLog('warning').length
 			},
 			countLogError() {
 				return this.filterLog('error').length
@@ -253,6 +271,12 @@
 				this.currentPage = 1
 				this.$store.dispatch('toggleFilterTerminal')
 			},
+			toggleFilterWarning() {
+				this.loadingData = true
+
+				this.currentPage = 1
+				this.$store.dispatch('toggleFilterWarning')
+			},
 			toggleFilterError() {
 				this.loadingData = true
 
@@ -275,18 +299,21 @@
 					this.types.debug = types.debug === undefined ? true : types.debug
 					this.types.exception = types.exception === undefined ? true : types.exception
 					this.types.terminal = types.terminal === undefined ? false : types.terminal
+					this.types.warning = types.warning === undefined ? false : types.warning
 					this.types.error = types.error === undefined ? true : types.error
 
 					this.$store.commit('setFilterInfo', this.types.info)
 					this.$store.commit('setFilterDebug', this.types.debug)
 					this.$store.commit('setFilterException', this.types.exception)
 					this.$store.commit('setFilterTerminal', this.types.terminal)
+					this.$store.commit('setFilterWarning', this.types.warning)
 					this.$store.commit('setFilterError', this.types.error)
 				} else {
 					this.types.info = true
 					this.types.debug = true
 					this.types.exception = true
 					this.types.terminal = false
+					this.types.warning = false
 					this.types.error = true
 				}
 			},

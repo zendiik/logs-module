@@ -76,6 +76,7 @@ class LogsControl extends Control {
 		$exception = $this->logPath . '/exception.log';
 		$error = $this->logPath . '/error.log';
 		$terminal = $this->logPath . '/terminal.log';
+		$warning = $this->logPath . '/warning.log';
 		$all = [];
 
 		if (file_exists($info) && is_array(file($info))) {
@@ -128,6 +129,19 @@ class LogsControl extends Control {
 			}
 
 			$all = array_merge($all, $terminals);
+		}
+
+		if (file_exists($warning) && is_array(file($warning))) {
+			$warnings = [];
+
+			foreach (file($warning) as $warn) {
+				$warnings[] = [
+					'message' => $warn,
+					'type' => 'terminal',
+				];
+			}
+
+			$all = array_merge($all, $warnings);
 		}
 
 		if (file_exists($error) && is_array(file($error))) {
