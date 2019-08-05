@@ -20,6 +20,9 @@ export default new Vuex.Store({
 		showFilterWarning: true,
 		showFilterError: true,
 
+		showFilterError404: true,
+		showFilterError403: true,
+
 		actualPage: 1,
 		filterDate: null,
 	},
@@ -60,6 +63,12 @@ export default new Vuex.Store({
 		getShowFilterError: state => {
 			return state.showFilterError
 		},
+		getShowFilterError404: state => {
+			return state.showFilterError404
+		},
+		getShowFilterError403: state => {
+			return state.showFilterError403
+		},
 		getActualPage: state => {
 			return state.actualPage
 		},
@@ -85,6 +94,12 @@ export default new Vuex.Store({
 		},
 		toggleFilterError(state) {
 			state.showFilterError = !state.showFilterError
+		},
+		toggleFilterError404(state) {
+			state.showFilterError404 = !state.showFilterError404
+		},
+		toggleFilterError403(state) {
+			state.showFilterError403 = !state.showFilterError403
 		},
 		setFilterInfo(state, info) {
 			state.filterInfo = info

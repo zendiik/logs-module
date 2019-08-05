@@ -148,9 +148,6 @@ class LogsControl extends Control {
 			$errors = [];
 
 			foreach (file($error) as $erro) {
-				// $re404 = '/PHP User Warning: Invalid link: No route for/';
-				// $re403 = '/Forbidden access:|Access denied:/';
-
 				$errors[] = [
 					'message' => $erro,
 					'type' => 'error',

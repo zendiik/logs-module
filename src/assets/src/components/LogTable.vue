@@ -47,12 +47,12 @@
 						<h2><strong>{{ countLogError }}</strong></h2>
 						error.log
 					</div>
-					<!--<div class="panel-footer text-center">
+					<div class="panel-footer text-center" @click.stop>
 						<div class="btn-group">
-							<button class="btn btn-default filter" data-type="403" data-bool="{$accessDenied}"><span class="fa fa-ban{if !$accessDenied} text-danger{else} text-success{/if}"></span> 403</button>
-							<button class="btn btn-default filter" data-type="404" data-bool="{$notFound}"><span class="fa fa-{if !$notFound}times text-danger{else}check text-success{/if}"></span> 404</button>
+							<button class="btn btn-default" @click="toggleFilterError403"><span class="fa fa-ban"  :class="filterError403 ? 'text-danger' : 'text-success'"></span> 403</button>
+							<button class="btn btn-default" @click="toggleFilterError404"><span class="fa" :class="filterError404 ? 'fa-times text-danger' : 'fa-check text-success'"></span> 404</button>
 						</div>
-					</div>-->
+					</div>
 				</div>
 			</div>
 		</div>
@@ -171,6 +171,12 @@
 			filterError() {
 				return this.$store.getters.getShowFilterError
 			},
+			filterError404() {
+				return !this.$store.getters.getShowFilterError404
+			},
+			filterError403() {
+				return !this.$store.getters.getShowFilterError403
+			},
 			filteredLog() {
 				let result = []
 
@@ -195,7 +201,17 @@
 				}
 
 				if (this.filterError) {
-					Array.prototype.push.apply(result, this.filterLog('error'))
+					let error = this.filterLog('error')
+
+					if (!this.$store.getters.getShowFilterError404) {
+						error = error.filter(log => !log.message.match(/PHP User Warning: Invalid link: No route for/g))
+					}
+
+					if (!this.$store.getters.getShowFilterError403) {
+						error = error.filter(log => !log.message.match(/Forbidden access:|Access denied:/g))
+					}
+
+					Array.prototype.push.apply(result, error)
 				}
 
 				return result.slice().sort((a, b) => {
@@ -223,7 +239,17 @@
 				return this.filterLog('warning').length
 			},
 			countLogError() {
-				return this.filterLog('error').length
+				let error = this.filterLog('error')
+
+				if (!this.$store.getters.getShowFilterError404) {
+					error = error.filter(log => !log.message.match(/PHP User Warning: Invalid link: No route for/g))
+				}
+
+				if (!this.$store.getters.getShowFilterError403) {
+					error = error.filter(log => !log.message.match(/Forbidden access:|Access denied:/g))
+				}
+
+				return error.length
 			},
 		},
 		created() {
@@ -285,6 +311,18 @@
 
 				this.currentPage = 1
 				this.$store.dispatch('toggleFilterError')
+			},
+			toggleFilterError403() {
+				this.loadingData = true
+
+				this.currentPage = 1
+				this.$store.commit('toggleFilterError403')
+			},
+			toggleFilterError404() {
+				this.loadingData = true
+
+				this.currentPage = 1
+				this.$store.commit('toggleFilterError404')
 			},
 			loadIframe(data) {
 				document.querySelector('#fileContent').src = 'data:text/html;charset=utf-8,' + escape(data);
