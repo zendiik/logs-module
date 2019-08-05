@@ -126,7 +126,7 @@
 			return {
 				loadingData: false,
 				perPage: 20,
-				currentPage: 1,
+				currentPage: this.$store.getters.getActualPage,
 				bootstrapPaginationClasses: {
 					ul: 'pagination',
 					liActive: 'active',
@@ -138,11 +138,11 @@
 				},
 				logs: [],
 				types: {
-					"info": true,
-					"debug": true,
-					"exception": true,
-					"terminal": true,
-					"error": true,
+					"info": this.$store.getters.getFilterInfo,
+					"debug": this.$store.getters.getFilterDebug,
+					"exception": this.$store.getters.getFilterException,
+					"terminal": this.$store.getters.getFilterTerminal,
+					"error": this.$store.getters.getFilterError,
 				}
 			}
 		},
@@ -154,22 +154,22 @@
 				return this.filteredLog.length
 			},
 			filterInfo() {
-				return this.$store.getters.filterInfo
+				return this.$store.getters.getShowFilterInfo
 			},
 			filterDebug() {
-				return this.$store.getters.filterDebug
+				return this.$store.getters.getShowFilterDebug
 			},
 			filterException() {
-				return this.$store.getters.filterException
+				return this.$store.getters.getShowFilterException
 			},
 			filterTerminal() {
-				return this.$store.getters.filterTerminal
+				return this.$store.getters.getShowFilterTerminal
 			},
 			filterWarning() {
-				return this.$store.getters.filterWarning
+				return this.$store.getters.getShowFilterWarning
 			},
 			filterError() {
-				return this.$store.getters.filterError
+				return this.$store.getters.getShowFilterError
 			},
 			filteredLog() {
 				let result = []
@@ -238,6 +238,9 @@
 		watch: {
 			filteredLogPaginated() {
 				this.loadingData = false
+			},
+			currentPage() {
+				this.$store.commit('setActualPage', this.currentPage)
 			}
 		},
 		methods: {
@@ -292,29 +295,33 @@
 				})
 			},
 			getTypes() {
-				if (initialState !== null) {
-					let types = JSON.parse(initialState.innerHTML).types
+				if (this.$store.getters.getFilterDate === null) {
+					if (initialState !== null) {
+						let types = JSON.parse(initialState.innerHTML).types
 
-					this.types.info = types.info === undefined ? true : types.info
-					this.types.debug = types.debug === undefined ? true : types.debug
-					this.types.exception = types.exception === undefined ? true : types.exception
-					this.types.terminal = types.terminal === undefined ? false : types.terminal
-					this.types.warning = types.warning === undefined ? false : types.warning
-					this.types.error = types.error === undefined ? true : types.error
+						this.types.info = types.info === undefined ? true : types.info
+						this.types.debug = types.debug === undefined ? true : types.debug
+						this.types.exception = types.exception === undefined ? true : types.exception
+						this.types.terminal = types.terminal === undefined ? false : types.terminal
+						this.types.warning = types.warning === undefined ? false : types.warning
+						this.types.error = types.error === undefined ? true : types.error
 
-					this.$store.commit('setFilterInfo', this.types.info)
-					this.$store.commit('setFilterDebug', this.types.debug)
-					this.$store.commit('setFilterException', this.types.exception)
-					this.$store.commit('setFilterTerminal', this.types.terminal)
-					this.$store.commit('setFilterWarning', this.types.warning)
-					this.$store.commit('setFilterError', this.types.error)
-				} else {
-					this.types.info = true
-					this.types.debug = true
-					this.types.exception = true
-					this.types.terminal = false
-					this.types.warning = false
-					this.types.error = true
+						this.$store.commit('setFilterInfo', this.types.info)
+						this.$store.commit('setFilterDebug', this.types.debug)
+						this.$store.commit('setFilterException', this.types.exception)
+						this.$store.commit('setFilterTerminal', this.types.terminal)
+						this.$store.commit('setFilterWarning', this.types.warning)
+						this.$store.commit('setFilterError', this.types.error)
+
+						this.$store.commit('setFilterDate', new Date())
+					} else {
+						this.types.info = true
+						this.types.debug = true
+						this.types.exception = true
+						this.types.terminal = false
+						this.types.warning = false
+						this.types.error = true
+					}
 				}
 			},
 			getLogs() {
@@ -324,7 +331,7 @@
 					// this.logs = require('../../public/logs.json')
 					this.logs = []
 				}
-			},
+			}
 		},
 	}
 </script>

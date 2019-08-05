@@ -12,45 +12,79 @@ export default new Vuex.Store({
 		filterTerminal: true,
 		filterWarning: true,
 		filterError: false,
+
+		showFilterInfo: true,
+		showFilterDebug: true,
+		showFilterException: true,
+		showFilterTerminal: true,
+		showFilterWarning: true,
+		showFilterError: true,
+
+		actualPage: 1,
+		filterDate: null,
 	},
 	getters: {
-		filterInfo: state => {
+		getFilterInfo: state => {
 			return state.filterInfo
 		},
-		filterDebug: state => {
+		getFilterDebug: state => {
 			return state.filterDebug
 		},
-		filterException: state => {
+		getFilterException: state => {
 			return state.filterException
 		},
-		filterTerminal: state => {
+		getFilterTerminal: state => {
 			return state.filterTerminal
 		},
-		filterWarning: state => {
+		getFilterWarning: state => {
 			return state.filterWarning
 		},
-		filterError: state => {
+		getFilterError: state => {
 			return state.filterError
+		},
+		getShowFilterInfo: state => {
+			return state.showFilterInfo
+		},
+		getShowFilterDebug: state => {
+			return state.showFilterDebug
+		},
+		getShowFilterException: state => {
+			return state.showFilterException
+		},
+		getShowFilterTerminal: state => {
+			return state.showFilterTerminal
+		},
+		getShowFilterWarning: state => {
+			return state.showFilterWarning
+		},
+		getShowFilterError: state => {
+			return state.showFilterError
+		},
+		getActualPage: state => {
+			return state.actualPage
+		},
+		getFilterDate: state => {
+			return state.filterDate
 		},
 	},
 	mutations: {
 		toggleFilterInfo(state) {
-			state.filterInfo = !state.filterInfo
+			state.showFilterInfo = !state.showFilterInfo
 		},
 		toggleFilterDebug(state) {
-			state.filterDebug = !state.filterDebug
+			state.showFilterDebug = !state.showFilterDebug
 		},
 		toggleFilterException(state) {
-			state.filterException = !state.filterException
+			state.showFilterException = !state.showFilterException
 		},
 		toggleFilterTerminal(state) {
-			state.filterTerminal = !state.filterTerminal
+			state.showFilterTerminal = !state.showFilterTerminal
 		},
 		toggleFilterWarning(state) {
-			state.filterWarning = !state.filterWarning
+			state.showFilterWarning = !state.showFilterWarning
 		},
 		toggleFilterError(state) {
-			state.filterError = !state.filterError
+			state.showFilterError = !state.showFilterError
 		},
 		setFilterInfo(state, info) {
 			state.filterInfo = info
@@ -69,7 +103,13 @@ export default new Vuex.Store({
 		},
 		setFilterError(state, error) {
 			state.filterError = error
-		}
+		},
+		setActualPage(state, page) {
+			state.actualPage = page
+		},
+		setFilterDate(state, date) {
+			state.filterDate = date
+		},
 	},
 	actions: {
 		toggleFilterInfo({ commit }) {

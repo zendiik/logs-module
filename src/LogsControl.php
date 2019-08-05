@@ -170,8 +170,8 @@ class LogsControl extends Control {
 				$allList[] = [
 					'dateTime' => $dateTime ? $dateTime->format('d.m.Y H:i:s') : 'datum neexistuje!',
 					'message' => substr($row['message'], 22),
-					'file' => empty($file) || !file_exists($file[0]) ? null : $this->logPath . '/' . $file[0],
-					'fileContent' => empty($file) || !file_exists($file[0]) ? null : FileSystem::read($this->logPath . '/' . $file[0]),
+					'file' => empty($file) || !file_exists($this->logPath . '/' . $file[0]) ? null : $this->logPath . '/' . $file[0],
+					'fileContent' => empty($file) || !file_exists($this->logPath . '/' . $file[0]) ? null : FileSystem::read($this->logPath . '/' . $file[0]),
 					'type' => $row['type'],
 				];
 			}
