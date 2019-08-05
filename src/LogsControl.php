@@ -163,7 +163,7 @@ class LogsControl extends Control {
 		$allList = [];
 
 		if (is_array($all)) {
-			foreach ($all as $row) {
+			foreach (array_reverse($all) as $row) {
 				preg_match('/(exception--[\S]+.html)/', $row['message'], $file);
 				$dateTime = DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19));
 
