@@ -2,7 +2,7 @@
 
 namespace Netleak\Logs;
 
-use Carbon\Carbon;
+use Cake\Chronos\Chronos;
 use DateTime;
 use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Control;
@@ -179,7 +179,7 @@ class LogsControl extends Control {
 
 	public function handleExportLogs(): void {
 		$logDirectory = $this->logPath . '/';
-		$zipName = 'logs_' . Carbon::now()->format('d-m-Y_h-i-s') . '.zip';
+		$zipName = 'logs_' . Chronos::now()->format('d-m-Y_h-i-s') . '.zip';
 		$zipPath = $this->tempPath . '/cache/' . $zipName;
 		$logs = scandir($logDirectory, SCANDIR_SORT_NONE);
 

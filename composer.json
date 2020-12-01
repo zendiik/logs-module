@@ -16,7 +16,7 @@
 		"nette/di": "^2.4",
 		"nette/application": "^2.4",
 		"nette/utils": "^2.5",
-		"carbondate/carbon": "^1.33"
+		"cakephp/chronos": "^2.0"
 	},
 	"autoload": {
 		"psr-4": {
