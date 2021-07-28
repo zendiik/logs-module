@@ -1,22 +1,591 @@
 <h1 n:block="title">Logy</h1>
 
 <div class="btn-group pull-right-btn" n:if="$logs !== '[]'">
-	<a n:href="exportLogs!" class="btn btn-warning"><span class="fa fa-download"></span> Exportovat logy</a>
-	<a n:href="deleteLogs!" class="btn btn-success"><span class="fa fa-trash"></span> Smazat log</a>
+    <a n:href="exportLogs!" class="btn btn-warning"><span class="fa fa-download"></span> Exportovat logy</a>
+    <a n:href="deleteLogs!" class="btn btn-success"><span class="fa fa-trash"></span> Smazat log</a>
 </div>
 
-<link href="{$publicPath}assets/css/app.86e18e27.css" rel=preload as=style>
-<link href="{$publicPath}assets/js/app.c97782d8.js" rel=preload as=script>
-<link href="{$publicPath}assets/js/chunk-vendors.9231627f.js" rel=preload as=script>
-<link href="{$publicPath}assets/css/app.86e18e27.css" rel=stylesheet>
-
-<div id=app></div>
+<div id="logs-app"></div>
 
 <script type="application/json" id="__INITIAL_STATE__" n:syntax="double">
 	{
 		"types": {{$types|noescape}},
 		"logs": {{$logs|noescape}}
 	}
+
 </script>
-<script src="{$publicPath}assets/js/chunk-vendors.9231627f.js" n:nonce></script>
-<script src="{$publicPath}assets/js/app.c97782d8.js" n:nonce></script>
+
+<script src="//cdn.jsdelivr.net/npm/less@4.1.1"></script>
+<script type="module" n:syntax="off">
+	import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.esm.browser.js';
+	import momentjs from 'https://cdn.jsdelivr.net/npm/moment@2.29.1/dist/moment.js';
+
+	const initialState = document.querySelector('#__INITIAL_STATE__');
+
+	const defaultClasses = {
+		ul: 'pagination',
+		li: 'pagination-item',
+		liActive: 'pagination-item--active',
+		liDisable: 'pagination-item--disable',
+		button: 'pagination-link',
+		buttonActive: 'pagination-link--active',
+		buttonDisable: 'pagination-link--disable'
+	}
+	const defaultLabels = {
+		first: '&laquo;',
+		prev: '&lsaquo;',
+		next: '&rsaquo;',
+		last: '&raquo;'
+	}
+
+	const pagination = Vue.component('pagination', {
+		template: '#pagination-template',
+		props: {
+			value: {  // current page
+				type: Number,
+				required: true
+			},
+			pageCount: { // page numbers
+				type: Number,
+				required: true
+			},
+			classes: {
+				type: Object,
+				required: false,
+				default: () => ({})
+			},
+			labels: {
+				type: Object,
+				required: false,
+				default: () => ({})
+			}
+		},
+		data() {
+			return {
+				paginationClasses: {
+					...defaultClasses,
+					...this.classes
+				},
+				paginationLabels: {
+					...defaultLabels,
+					...this.labels
+				}
+			}
+		},
+		mounted() {
+			if (this.value > this.pageCount) {
+				this.$emit('input', this.pageCount)
+			}
+		},
+		computed: {
+			items() {
+				let valPrev = this.value > 1 ? (this.value - 1) : 1 // for easier navigation - gives one previous page
+				let valNext = this.value < this.pageCount ? (this.value + 1) : this.pageCount // one next page
+				let extraPrev = valPrev === 3 ? 2 : null
+				let extraNext = valNext === (this.pageCount - 2) ? (this.pageCount - 1) : null
+				let dotsBefore = valPrev > 3 ? 2 : null
+				let dotsAfter = valNext < (this.pageCount - 2) ? (this.pageCount - 1) : null
+				let output = []
+				for (let i = 1; i <= this.pageCount; i += 1) {
+					if ([ 1, this.pageCount, this.value, valPrev, valNext, extraPrev, extraNext, dotsBefore, dotsAfter ].includes(i)) {
+						output.push({
+							label: i,
+							active: this.value === i,
+							disable: [ dotsBefore, dotsAfter ].includes(i)
+						})
+					}
+				}
+				return output
+			},
+			hasFirst() {
+				return (this.value === 1)
+			},
+			hasLast() {
+				return (this.value === this.pageCount)
+			},
+		},
+		watch: {
+			value: function () {
+				this.$emit('change')
+			}
+		},
+		methods: {
+			prev() {
+				if (!this.hasFirst) {
+					const page = this.value - 1;
+
+					this.$emit('input', page)
+
+					window.history.pushState({}, "", `#${page}`);
+				}
+			},
+			goto(page) {
+				this.$emit('input', page)
+				window.history.pushState({}, "", `#${page}`);
+			},
+			next() {
+				if (!this.hasLast) {
+					const page = this.value + 1;
+
+					this.$emit('input', page)
+
+					window.history.pushState({}, "", `#${page}`);
+				}
+			},
+		}
+	});
+
+	Vue.component('log-table', {
+		template: '#log-table-template',
+		components: {
+			pagination
+		},
+		data() {
+			return {
+				loadingData: false,
+				perPage: 20,
+				route: window.location.hash,
+				currentPage: 1,
+				bootstrapPaginationClasses: {
+					ul: 'pagination',
+					liActive: 'active',
+					liDisable: 'disabled'
+				},
+				customLabels: {
+					prev: '&larr;',
+					next: '&rarr;'
+				},
+				logs: [],
+				types: JSON.parse(initialState.innerHTML).types,
+				toggleFilter: {},
+				filter: {},
+				descFilter: '',
+				fileFilter: '',
+			}
+		},
+		computed: {
+			pages() {
+				return Math.ceil(this.rows / this.perPage)
+			},
+			rows() {
+				return this.filteredLog.length
+			},
+			filteredLog() {
+				let result = []
+
+				this.types.forEach(type => {
+					if (this.filter[type]) {
+						Array.prototype.push.apply(result, this.filterLog(type));
+					}
+				});
+
+				if (this.fileFilter !== '') {
+					result = result.filter(({ file }) => {
+						if (this.fileFilter) {
+							return file !== null;
+						} else {
+							return file === null;
+						}
+					});
+				}
+
+				if (this.descFilter.length !== 0) {
+					result = result.filter(({ message }) => {
+						const mess = message.toLowerCase();
+						const searchTerm = this.descFilter.toLowerCase();
+
+						return mess.includes(searchTerm);
+					});
+				}
+
+				// if (this.datetime !== '') {
+				// 	result = result.filter(({ dateTime }) => {
+				// 		const pattern = /(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2}):(\d{2})/;
+				// 		const dt = new Date(dateTime.replace(pattern, '$3-$2-$1 $4:$5:$6'));
+				// 		console.log(dt)
+				// 	});
+				// }
+
+				return result.slice().sort((a, b) => {
+					return this.momentDate(b.dateTime) - this.momentDate(a.dateTime)
+				})
+			},
+			filteredLogPaginated() {
+				let start = (this.currentPage - 1) * this.perPage
+
+				return this.filteredLog.slice(start, start + this.perPage)
+			},
+		},
+		created() {
+			this.types.forEach(type => {
+				this.$set(this.toggleFilter, type, () => {
+					this.loadingData = true
+
+					this.setPage(1)
+
+					this.filter[type] = !this.filter[type];
+				});
+
+				this.$set(this.filter, type, true)
+			});
+
+			this.getLogs()
+
+			const hash = window.location.hash;
+
+			if (hash.length >= 1) {
+				let pageNumber = parseInt(hash.substr(1));
+
+				if (pageNumber > this.pages) {
+					pageNumber = this.pages;
+				}
+
+				this.setPage(pageNumber);
+			}
+		},
+		filters: {
+			date(value) {
+				return momentjs.utc(value, 'DD.MM.YYYY HH:mm:ss').format('<b>DD.MM.YYYY</b> HH:mm:ss')
+			}
+		},
+		watch: {
+			filteredLogPaginated() {
+				this.loadingData = false
+			},
+			route: function () {
+				this.currentPage = window.location.hash.split("#/")[1];
+			}
+		},
+		methods: {
+			setPage(number) {
+				this.currentPage = number;
+				window.history.pushState({}, "", `#${number}`);
+			},
+			resetPage() {
+				this.setPage(1);
+			},
+			getColor(type) {
+				switch (type) {
+					case 'info':
+						return 'info';
+
+					case 'error':
+						return 'danger';
+
+					case 'exception':
+						return 'warning';
+
+					case 'debug':
+						return 'success';
+
+					case 'terminal':
+						return 'terminal';
+
+					default:
+						return 'default2';
+				}
+			},
+			filteredLogCount(type) {
+				return this.filteredLog.filter(log => {
+					return log.type === type
+				}).length;
+			},
+			momentDate(dateTime) {
+				return momentjs.utc(dateTime, 'DD.MM.YYYY HH:mm:ss').toDate()
+			},
+			async loadIframe(getFileUrl) {
+				let content = 'Nic tu neni!';
+
+				await fetch(getFileUrl)
+					.then(res => res.text())
+					.then(data => {
+						content = data;
+					})
+					.catch(err => console.error(err))
+
+				document.querySelector('#fileContent').src = 'data:text/html;charset=utf-8,' + escape(content);
+			},
+			filterLog(type) {
+				return this.logs.filter(log => {
+					return !type || log.type.indexOf(type) > -1
+				})
+			},
+			getLogs() {
+				if (initialState !== null) {
+					this.logs = JSON.parse(initialState.innerHTML).logs
+				} else {
+					this.logs = []
+				}
+			}
+		},
+	})
+
+	new Vue({
+        template: '<log-table />',
+		el: '#logs-app',
+	});
+</script>
+
+<script id="log-table-template" type="text/x-template" n:syntax="off">
+    <div class="log-table" v-cloak :class="{'loading': loadingData}">
+        <div class="row-f">
+            <div class="column" v-for="type in types">
+                <div class="click panel" :class="filter[type] ? `panel-${getColor(type)}` : 'panel-default'"
+                     @click="toggleFilter[type]">
+                    <div class="panel-heading text-center filter" data-type="info">
+                        <h2><strong>{{ filteredLogCount(type) }}</strong></h2>
+                        {{ type }}.log
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <pagination
+                v-model="currentPage"
+                :page-count="pages"
+                :classes="bootstrapPaginationClasses"
+                :labels="customLabels"
+        ></pagination>
+
+        <table class="table table-stripped table-bordered table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Date And Time</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th><input type="text" v-model="descFilter" class="form-control" @input="resetPage"></th>
+                    <th>
+                        <select v-model="fileFilter" class="form-control" @input="resetPage">
+                            <option value="">Vyberte</option>
+                            <option :value="true">Ano</option>
+                            <option :value="false">Ne</option>
+                        </select>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(log, index) in filteredLogPaginated" :key="index">
+                    <td v-html="$options.filters.date(log.dateTime)"></td>
+                    <td>
+                        <span :class="['label', `label-${getColor(log . type)}`]">{{ log.type }}</span>
+                        {{ log.message }}
+                    </td>
+                    <td>
+                        <a data-toggle="modal" data-target="#iframe" class="logLink" v-if="log.file !== null"
+                           @click="loadIframe(log.file)">
+                            <span class="fa fa-file" />
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <pagination
+                v-model="currentPage"
+                :page-count="pages"
+                :classes="bootstrapPaginationClasses"
+                :labels="customLabels"
+        ></pagination>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="iframe" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <iframe frameborder="0" id="fileContent" class="modal-content" width="100%" height="700vh"></iframe>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="pagination-template" type="text/x-template" n:syntax="off">
+    <nav aria-label="Pagination" class="text-center">
+        <ul :class="paginationClasses.ul">
+            <li
+                    v-if="paginationLabels.prev"
+                    :class="`${paginationClasses.li} ${hasFirst ? paginationClasses.liDisable : ''}`"
+            >
+                <a
+                        @click="prev"
+                        :disabled="hasFirst"
+                        :class="`${paginationClasses.button} ${hasFirst ? paginationClasses.buttonDisable : ''}`"
+                        v-html="paginationLabels.prev"
+                ></a>
+            </li>
+
+            <li
+                    v-for="page in items"
+                    :key="page.label"
+                    :class="`${paginationClasses.li} ${page.active ? paginationClasses.liActive : ''} ${page.disable ? paginationClasses.liDisable : ''}`"
+            >
+		<span
+                v-if="page.disable"
+                :class="`${paginationClasses.button} ${paginationClasses.buttonDisable}`"
+        >...</span>
+                <a
+                        v-else
+                        @click="goto(page.label)"
+                        :class="`${paginationClasses.button} ${page.active ? paginationClasses.buttonActive : ''}`"
+                >
+                    {{ page.label }}
+                </a>
+            </li>
+
+            <li
+                    v-if="paginationLabels.next"
+                    :class="`${paginationClasses.li} ${hasLast ? paginationClasses.liDisable : ''}`"
+            >
+                <a
+                        @click="next"
+                        :disabled="hasLast"
+                        :class="`${paginationClasses.button} ${hasLast ? paginationClasses.buttonDisable : ''}`"
+                        v-html="paginationLabels.next"
+                ></a>
+            </li>
+        </ul>
+    </nav>
+</script>
+
+<style rel="stylesheet/less" type="text/css">
+	@brand-lighter: #9FE9C1;
+	@brand-lightest: #a8f4bf;
+	@brand-primary: #009645;
+
+	.
+
+	size
+	(
+	@width; @height) {
+		width: @width;
+		height: @height;
+	}
+
+	.loading {
+		position: relative;
+		overflow: hidden;
+
+	/* aby nepřeteklo u skrtých a minimalizovaných snippetů */
+	&
+	:after {
+		position: absolute;
+		display: block;
+		z-index: 10;
+		content: "";
+		top: 20vh;
+		left: 50%;
+		margin-left: -25px;
+	/ / margin-top: - 25 px;
+	. size(50 px, 50 px);
+		background-image: url("../../public/puff.svg");
+		background-position: center center;
+		background-size: cover;
+	}
+
+	&
+	:before {
+		position: absolute;
+		display: block;
+		z-index: 10;
+		content: "";
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	. size(100 %, 100 %);
+		background-color: rgba(0, 128, 255, 0.7);
+	}
+
+	}
+
+	[v-cloak] > * {
+		display: none;
+	}
+
+	[v-cloak]::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		z-index: 1;
+		margin: -75px 0 0 -75px;
+		border: 16px solid #f3f3f3;
+		border-radius: 50%;
+		border-top: 16px solid #3498db;
+		width: 120px;
+		height: 120px;
+		-webkit-animation: spin 2s linear infinite;
+		animation: spin 2s linear infinite;
+	}
+
+	@-webkit-keyframes spin {
+		0% {
+			-webkit-transform: rotate(0deg);
+		}
+		100% {
+			-webkit-transform: rotate(360deg);
+		}
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	.panel-terminal {
+		background-color: @brand-lightest;
+		border-color: @brand-lighter;
+		color: @brand-primary;
+	}
+
+	.label-terminal {
+		background-color: @brand-lighter;
+		color: @brand-primary;
+	}
+
+	.panel-default2 {
+		background-color: #ecf0f1;
+		border-color: #bdc3c7;
+		color: #7f8c8d;
+	}
+
+	.label-default2 {
+		background-color: #bdc3c7;
+		color: #7f8c8d;
+	}
+
+	.logLink {
+		cursor: pointer;
+	}
+
+	.click {
+		cursor: pointer;
+	}
+
+	.row-f {
+		display: flex;
+		justify-content: center;
+	}
+
+	.column {
+		width: 12%;
+		margin-right: 1%;
+		text-align: center;
+	}
+
+	a:hover {
+		cursor: pointer;
+	}
+
+	a {
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+</style>

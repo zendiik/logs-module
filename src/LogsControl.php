@@ -135,7 +135,7 @@ class LogsControl extends Control {
 			preg_match('/(exception--[\S]+.html)/', $row['message'], $file);
 			$dateTime = DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19));
 
-			$fileLink = !empty($file) || file_exists($this->logPath . $file[0])
+			$fileLink = !empty($file) || (isset($file[0]) && file_exists($this->logPath . $file[0]))
 				? $this->link('showLogHtml!', ['fileName' => $file[0]]) : null;
 
 			$allList[] = [
