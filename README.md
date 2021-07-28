@@ -4,7 +4,7 @@
 
 Nad projektem spusťte:
 ```shell
-composer require netleak/logs
+composer require netleak/log-control
 ```
 
 Následně v presenteru vygenerujte komponentu:
