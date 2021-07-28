@@ -285,9 +285,9 @@
 						return 'default2';
 				}
 			},
-			filteredLogCount(type) {
-				return this.filteredLog.filter(log => {
-					return log.type === type
+			logCount(type) {
+				return this.logs.filter(log => {
+					return log.type === type;
 				}).length;
 			},
 			momentDate(dateTime) {
@@ -321,7 +321,7 @@
 	})
 
 	new Vue({
-        template: '<log-table />',
+		template: '<log-table />',
 		el: '#logs-app',
 	});
 </script>
@@ -333,7 +333,7 @@
                 <div class="click panel" :class="filter[type] ? `panel-${getColor(type)}` : 'panel-default'"
                      @click="toggleFilter[type]">
                     <div class="panel-heading text-center filter" data-type="info">
-                        <h2><strong>{{ filteredLogCount(type) }}</strong></h2>
+                        <h2><strong>{{ logCount(type) }}</strong></h2>
                         {{ type }}.log
                     </div>
                 </div>
