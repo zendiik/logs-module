@@ -1,57 +1,11 @@
 <template>
-	<div class="log-table" v-cloak>
+	<div class="log-table" v-cloak :class="{'loading': loadingData}">
 		<div class="row-f">
-			<div class="column" v-if="types.info">
-				<div class="click panel" :class="filterInfo ? 'panel-info' : 'panel-default'" @click="toggleFilterInfo">
+			<div class="column" v-for="type in types">
+				<div class="click panel" :class="filter[type] ? `panel-${getColor(type)}` : 'panel-default'" @click="toggleFilter[type]">
 					<div class="panel-heading text-center filter" data-type="info">
-						<h2><strong>{{ countLogInfo }}</strong></h2>
-						info.log
-					</div>
-				</div>
-			</div>
-			<div class="column" v-if="types.debug">
-				<div class="click panel" :class="filterDebug ? 'panel-success' : 'panel-default'" @click="toggleFilterDebug">
-					<div class="panel-heading text-center filter" data-type="info">
-						<h2><strong>{{ countLogDebug }}</strong></h2>
-						debug.log
-					</div>
-				</div>
-			</div>
-			<div class="column" v-if="types.exception">
-				<div class="click panel" :class="filterException ? 'panel-warning' : 'panel-default'" @click="toggleFilterException">
-					<div class="panel-heading text-center filter" data-type="info">
-						<h2><strong>{{ countLogException }}</strong></h2>
-						exception.log
-					</div>
-				</div>
-			</div>
-			<div class="column" v-if="types.terminal">
-				<div class="click panel" :class="filterTerminal ? 'panel-terminal' : 'panel-default'" @click="toggleFilterTerminal">
-					<div class="panel-heading text-center filter" data-type="info">
-						<h2><strong>{{ countLogTerminal }}</strong></h2>
-						terminal.log
-					</div>
-				</div>
-			</div>
-			<div class="column" v-if="types.warning">
-				<div class="click panel" :class="filterWarning ? 'panel-warning' : 'panel-default'" @click="toggleFilterWarning">
-					<div class="panel-heading text-center filter" data-type="info">
-						<h2><strong>{{ countLogWarning }}</strong></h2>
-						warning.log
-					</div>
-				</div>
-			</div>
-			<div class="column" v-if="types.error">
-				<div class="click panel" :class="filterError ? 'panel-danger' : 'panel-default'" @click="toggleFilterError">
-					<div class="panel-heading text-center filter" data-type="info">
-						<h2><strong>{{ countLogError }}</strong></h2>
-						error.log
-					</div>
-					<div class="panel-footer text-center" @click.stop>
-						<div class="btn-group">
-							<button class="btn btn-default" @click="toggleFilterError403"><span class="fa fa-ban"  :class="filterError403 ? 'text-danger' : 'text-success'"></span> 403</button>
-							<button class="btn btn-default" @click="toggleFilterError404"><span class="fa" :class="filterError404 ? 'fa-times text-danger' : 'fa-check text-success'"></span> 404</button>
-						</div>
+						<h2><strong>{{ filteredLogCount(type) }}</strong></h2>
+							{{ type }}.log
 					</div>
 				</div>
 			</div>
@@ -73,21 +27,27 @@
 					<th>Description</th>
 					<th></th>
 				</tr>
+				<tr>
+					<th></th>
+					<th><input type="text" v-model="descFilter" class="form-control" @input="resetPage"></th>
+					<th>
+						<select v-model="fileFilter" class="form-control" @input="resetPage">
+							<option value="">Vyberte</option>
+							<option :value="true">Ano</option>
+							<option :value="false">Ne</option>
+						</select>
+					</th>
+				</tr>
 			</thead>
-			<tbody :class="{'loading': loadingData}">
+			<tbody>
 				<tr v-for="(log, index) in filteredLogPaginated" :key="index">
 					<td v-html="$options.filters.date(log.dateTime)"></td>
 					<td>
-						<span class="label label-danger" v-if="log.type === 'error'">{{ log.type }}</span>
-						<span class="label label-terminal" v-else-if="log.type === 'terminal'">{{ log.type }}</span>
-						<span class="label label-warning" v-else-if="log.type === 'exception'">{{ log.type }}</span>
-						<span class="label label-info" v-else-if="log.type === 'info'">{{ log.type }}</span>
-						<span class="label label-success" v-else-if="log.type === 'debug'">{{ log.type }}</span>
-						<span class="label label-default" v-else>{{ log.type }}</span>
+						<span :class="['label', `label-${getColor(log.type)}`]">{{ log.type }}</span>
 						{{ log.message }}
 					</td>
 					<td>
-						<a data-toggle="modal" data-target="#iframe" class="logLink" v-if="log.file !== null" @click="loadIframe(log.fileContent)">
+						<a data-toggle="modal" data-target="#iframe" class="logLink" v-if="log.file !== null" @click="loadIframe(log.file)">
 							<fa-icon icon="file" />
 						</a>
 					</td>
@@ -120,13 +80,14 @@
 	export default {
 		name: 'LogTable',
 		components: {
-			Pagination
+			Pagination,
 		},
 		data() {
 			return {
 				loadingData: false,
 				perPage: 20,
-				currentPage: this.$store.getters.getActualPage,
+				route: window.location.hash,
+				currentPage: 1,
 				bootstrapPaginationClasses: {
 					ul: 'pagination',
 					liActive: 'active',
@@ -137,13 +98,11 @@
 					next: '&rarr;'
 				},
 				logs: [],
-				types: {
-					"info": this.$store.getters.getFilterInfo,
-					"debug": this.$store.getters.getFilterDebug,
-					"exception": this.$store.getters.getFilterException,
-					"terminal": this.$store.getters.getFilterTerminal,
-					"error": this.$store.getters.getFilterError,
-				}
+				types: JSON.parse(initialState.innerHTML).types,
+				toggleFilter: {},
+				filter: {},
+				descFilter: '',
+				fileFilter: '',
 			}
 		},
 		computed: {
@@ -153,66 +112,41 @@
 			rows() {
 				return this.filteredLog.length
 			},
-			filterInfo() {
-				return this.$store.getters.getShowFilterInfo
-			},
-			filterDebug() {
-				return this.$store.getters.getShowFilterDebug
-			},
-			filterException() {
-				return this.$store.getters.getShowFilterException
-			},
-			filterTerminal() {
-				return this.$store.getters.getShowFilterTerminal
-			},
-			filterWarning() {
-				return this.$store.getters.getShowFilterWarning
-			},
-			filterError() {
-				return this.$store.getters.getShowFilterError
-			},
-			filterError404() {
-				return !this.$store.getters.getShowFilterError404
-			},
-			filterError403() {
-				return !this.$store.getters.getShowFilterError403
-			},
 			filteredLog() {
 				let result = []
 
-				if (this.filterInfo) {
-					Array.prototype.push.apply(result, this.filterLog('info'))
-				}
-
-				if (this.filterDebug) {
-					Array.prototype.push.apply(result, this.filterLog('debug'))
-				}
-
-				if (this.filterException) {
-					Array.prototype.push.apply(result, this.filterLog('exception'))
-				}
-
-				if (this.filterTerminal) {
-					Array.prototype.push.apply(result, this.filterLog('terminal'))
-				}
-
-				if (this.filterWarning) {
-					Array.prototype.push.apply(result, this.filterLog('warning'))
-				}
-
-				if (this.filterError) {
-					let error = this.filterLog('error')
-
-					if (!this.$store.getters.getShowFilterError404) {
-						error = error.filter(log => !log.message.match(/PHP User Warning: Invalid link: No route for/g))
+				this.types.forEach(type => {
+					if (this.filter[type]) {
+						Array.prototype.push.apply(result, this.filterLog(type));
 					}
+				});
 
-					if (!this.$store.getters.getShowFilterError403) {
-						error = error.filter(log => !log.message.match(/Forbidden access:|Access denied:/g))
-					}
-
-					Array.prototype.push.apply(result, error)
+				if (this.fileFilter !== '') {
+					result = result.filter(({ file }) => {
+						if (this.fileFilter) {
+							return file !== null;
+						} else {
+							return file === null;
+						}
+					});
 				}
+
+				if (this.descFilter.length !== 0) {
+					result = result.filter(({ message }) => {
+						const mess = message.toLowerCase();
+						const searchTerm = this.descFilter.toLowerCase();
+
+						return mess.includes(searchTerm);
+					});
+				}
+
+				// if (this.datetime !== '') {
+				// 	result = result.filter(({ dateTime }) => {
+				// 		const pattern = /(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2}):(\d{2})/;
+				// 		const dt = new Date(dateTime.replace(pattern, '$3-$2-$1 $4:$5:$6'));
+				// 		console.log(dt)
+				// 	});
+				// }
 
 				return result.slice().sort((a, b) => {
 					return this.momentDate(b.dateTime) - this.momentDate(a.dateTime)
@@ -223,38 +157,33 @@
 
 				return this.filteredLog.slice(start, start + this.perPage)
 			},
-			countLogInfo() {
-				return this.filterLog('info').length
-			},
-			countLogDebug() {
-				return this.filterLog('debug').length
-			},
-			countLogException() {
-				return this.filterLog('exception').length
-			},
-			countLogTerminal() {
-				return this.filterLog('terminal').length
-			},
-			countLogWarning() {
-				return this.filterLog('warning').length
-			},
-			countLogError() {
-				let error = this.filterLog('error')
-
-				if (!this.$store.getters.getShowFilterError404) {
-					error = error.filter(log => !log.message.match(/PHP User Warning: Invalid link: No route for/g))
-				}
-
-				if (!this.$store.getters.getShowFilterError403) {
-					error = error.filter(log => !log.message.match(/Forbidden access:|Access denied:/g))
-				}
-
-				return error.length
-			},
 		},
 		created() {
+			this.types.forEach(type => {
+				this.$set(this.toggleFilter, type, () => {
+					this.loadingData = true
+
+					this.setPage(1)
+
+					this.filter[type] = !this.filter[type];
+				});
+
+				this.$set(this.filter, type, true)
+			});
+
 			this.getLogs()
-			this.getTypes()
+
+			const hash = window.location.hash;
+
+			if (hash.length >= 1) {
+				let pageNumber = parseInt(hash.substr(1));
+
+				if (pageNumber > this.pages) {
+					pageNumber = this.pages;
+				}
+
+				this.setPage(pageNumber);
+			}
 		},
 		filters: {
 			date(value) {
@@ -265,108 +194,68 @@
 			filteredLogPaginated() {
 				this.loadingData = false
 			},
-			currentPage() {
-				this.$store.commit('setActualPage', this.currentPage)
+			route: function(){
+				this.currentPage = window.location.hash.split("#/")[1];
 			}
 		},
 		methods: {
-			sleep(ms) {
-				return new Promise(resolve => setTimeout(resolve, ms))
+			setPage(number) {
+				this.currentPage = number;
+				window.history.pushState({},"", `#${number}`);
+			},
+			resetPage() {
+				this.setPage(1);
+			},
+			getColor(type) {
+				switch (type) {
+					case 'info':
+						return 'info';
+
+					case 'error':
+						return 'danger';
+
+					case 'exception':
+						return 'warning';
+
+					case 'debug':
+						return 'success';
+
+					case 'terminal':
+						return 'terminal';
+
+					default:
+						return 'default2';
+				}
+			},
+			filteredLogCount(type) {
+				return this.filteredLog.filter(log => {
+					return log.type === type
+				}).length;
 			},
 			momentDate(dateTime) {
 				return momentjs.utc(dateTime, 'DD.MM.YYYY HH:mm:ss').toDate()
 			},
-			toggleFilterInfo() {
-				this.loadingData = true
+			async loadIframe(getFileUrl) {
+				let content = 'Nic tu neni!';
 
-				this.currentPage = 1
-				this.$store.dispatch('toggleFilterInfo')
-			},
-			toggleFilterDebug() {
-				this.loadingData = true
+				await fetch(getFileUrl)
+					.then(res => res.text())
+					.then(data => {
+						content = data;
+					})
+					.catch(err => console.error(err))
 
-				this.currentPage = 1
-				this.$store.dispatch('toggleFilterDebug')
-			},
-			toggleFilterException() {
-				this.loadingData = true
-
-				this.currentPage = 1
-				this.$store.dispatch('toggleFilterException')
-			},
-			toggleFilterTerminal() {
-				this.loadingData = true
-
-				this.currentPage = 1
-				this.$store.dispatch('toggleFilterTerminal')
-			},
-			toggleFilterWarning() {
-				this.loadingData = true
-
-				this.currentPage = 1
-				this.$store.dispatch('toggleFilterWarning')
-			},
-			toggleFilterError() {
-				this.loadingData = true
-
-				this.currentPage = 1
-				this.$store.dispatch('toggleFilterError')
-			},
-			toggleFilterError403() {
-				this.loadingData = true
-
-				this.currentPage = 1
-				this.$store.commit('toggleFilterError403')
-			},
-			toggleFilterError404() {
-				this.loadingData = true
-
-				this.currentPage = 1
-				this.$store.commit('toggleFilterError404')
-			},
-			loadIframe(data) {
-				document.querySelector('#fileContent').src = 'data:text/html;charset=utf-8,' + escape(data);
+				document.querySelector('#fileContent').src = 'data:text/html;charset=utf-8,' + escape(content);
 			},
 			filterLog(type) {
 				return this.logs.filter(log => {
 					return !type || log.type.indexOf(type) > -1
 				})
 			},
-			getTypes() {
-				if (this.$store.getters.getFilterDate === null) {
-					if (initialState !== null) {
-						let types = JSON.parse(initialState.innerHTML).types
-
-						this.types.info = types.info === undefined ? true : types.info
-						this.types.debug = types.debug === undefined ? true : types.debug
-						this.types.exception = types.exception === undefined ? true : types.exception
-						this.types.terminal = types.terminal === undefined ? false : types.terminal
-						this.types.warning = types.warning === undefined ? false : types.warning
-						this.types.error = types.error === undefined ? true : types.error
-
-						this.$store.commit('setFilterInfo', this.types.info)
-						this.$store.commit('setFilterDebug', this.types.debug)
-						this.$store.commit('setFilterException', this.types.exception)
-						this.$store.commit('setFilterTerminal', this.types.terminal)
-						this.$store.commit('setFilterWarning', this.types.warning)
-						this.$store.commit('setFilterError', this.types.error)
-
-						this.$store.commit('setFilterDate', new Date())
-					} else {
-						this.types.info = true
-						this.types.debug = true
-						this.types.exception = true
-						this.types.terminal = false
-						this.types.warning = false
-						this.types.error = true
-					}
-				}
-			},
 			getLogs() {
 				if (initialState !== null) {
 					this.logs = JSON.parse(initialState.innerHTML).logs
 				} else {
-					// this.logs = require('../../public/logs.json')
 					this.logs = []
 				}
 			}
@@ -448,6 +337,17 @@
 	.label-terminal {
 		background-color: @brand-lighter;
 		color: @brand-primary;
+	}
+
+	.panel-default2 {
+		background-color: #ecf0f1;
+		border-color: #bdc3c7;
+		color: #7f8c8d;
+	}
+
+	.label-default2 {
+		background-color: #bdc3c7;
+		color: #7f8c8d;
 	}
 
 	.logLink {

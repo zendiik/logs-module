@@ -17,9 +17,7 @@
     "core-js": "^2.6.5",
     "moment": "^2.24.0",
     "vue": "^2.6.10",
-    "vue-axios": "^2.1.4",
-    "vuex": "^3.0.1",
-    "vuex-persist": "^2.0.0"
+    "vue-axios": "^2.1.4"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.4.4",

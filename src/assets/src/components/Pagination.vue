@@ -137,15 +137,24 @@
 		methods: {
 			prev() {
 				if (!this.hasFirst) {
-					this.$emit('input', (this.value - 1))
+					const page = this.value - 1;
+
+					this.$emit('input', page)
+
+					window.history.pushState({},"", `#${page}`);
 				}
 			},
 			goto(page) {
 				this.$emit('input', page)
+				window.history.pushState({},"", `#${page}`);
 			},
 			next() {
 				if (!this.hasLast) {
-					this.$emit('input', (this.value + 1))
+					const page = this.value + 1;
+
+					this.$emit('input', page)
+
+					window.history.pushState({},"", `#${page}`);
 				}
 			},
 		}

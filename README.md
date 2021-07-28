@@ -4,9 +4,6 @@
 
 Přidejte do `composer.json`:
 ```json
-"scripts": {
-	"post-autoload-dump": "npm install git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git"
-},
 "repositories": [
 	{
 		"type": "vcs",
@@ -16,8 +13,9 @@ Přidejte do `composer.json`:
 ```
 
 Nad projektem spusťte:
-```bash
-composer require oksystem/logs 
+```shell
+composer require oksystem/logs
+npm install git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git
 ```
 
 Následně v presenteru vygenerujte komponentu:
@@ -26,13 +24,10 @@ Následně v presenteru vygenerujte komponentu:
 public function createComponentLogs(string $name): void {
 	$logs = new LogsControl(__DIR__ . '/../../../', '/'); // cesta k rootu aplikace, '/' je automatický prefix veřejné cesty k assetům
 
-	// pokud chcete logování terminal.log či warning.log 
-	// zbytek je automaticky zobrazen
-	// pro vypnutí stačí přidat řádek s false hodnotou (eg. `'error' => false`)
-	$logs->useLogs = array(
-		'terminal' => true,
-		'warning' => true
-	);
+	// pokud chcete zakázat zobrazení logu warning.log a error.log
+	// stačí přidat název souboru 
+	// zbytek ze složky s logy je automaticky zobrazen
+	$logs->disableLogs('warning', 'error');
 
     $this->addComponent($logs, $name);
 }
