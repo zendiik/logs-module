@@ -15,7 +15,6 @@ Přidejte do `composer.json`:
 Nad projektem spusťte:
 ```shell
 composer require oksystem/logs
-npm install git+ssh://git@bitbucket.oksystem.local:7999/web/logs-module-assets.git
 ```
 
 Následně v presenteru vygenerujte komponentu:
