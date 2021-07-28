@@ -1,20 +1,10 @@
-# Logs Module
+# Logs Control
 
 ### Instalace
 
-Přidejte do `composer.json`:
-```json
-"repositories": [
-	{
-		"type": "vcs",
-		"url": "ssh://git@bitbucket.oksystem.local:7999/web/logs-module.git"
-	}
-],
-```
-
 Nad projektem spusťte:
 ```shell
-composer require oksystem/logs
+composer require netleak/logs
 ```
 
 Následně v presenteru vygenerujte komponentu:

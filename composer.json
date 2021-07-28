@@ -1,11 +1,11 @@
 {
-	"name": "oksystem/logs",
-	"description": "Logs extension for OKsystem a.s. website development.",
+	"name": "netleak/log-control",
+	"description": "Logs control module for Nette.",
 	"license": "MIT",
 	"authors": [
 		{
-			"name": "Jan Ženíšek (OKsystem a.s.)",
-			"email": "zenisek@oksystem.cz"
+			"name": "Jan Ženíšek",
+			"email": "netleak@zendovo.eu"
 		}
 	],
 	"minimum-stability": "stable",
@@ -28,11 +28,5 @@
 		"phpstan/phpstan": "^0.12",
 		"consistence/coding-standard": "^3.10",
 		"slevomat/coding-standard": "^6.4"
-	},
-	"scripts": {
-		"test": [
-			"phpcs",
-			"phpstan analyze -l 7 -c ./phpstan.neon /src"
-		]
 	}
 }
