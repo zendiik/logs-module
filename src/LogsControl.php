@@ -15,38 +15,27 @@ class LogsControl extends Control {
 
 	public const RETURN_DATA = 2;
 
-	/**
-	 * @var string|null
-	 */
-	private $rootPath;
+	/** @var array<string> */
+	public array $types = [];
 
-	/**
-	 * @var string|null
-	 */
-	private $logPath;
+	/** @var array<string> */
+	public array $disabled = [];
 
-	/**
-	 * @var string|null
-	 */
-	private $tempPath;
+	private ?string $rootPath;
 
-	/**
-	 * @var string|null
-	 */
-	private $publicPath = '/';
+	private ?string $logPath;
 
-	/**
-	 * @var array<string>
-	 */
-	public $types = [];
+	private ?string $tempPath;
 
-	/**
-	 * @var array<string>
-	 */
-	public $disabled = [];
+	private ?string $publicPath = '/';
 
-	public function __construct(string $rootPath, ?string $publicPath = null, ?IContainer $parent = null, ?string $name = null) {
-		parent::__construct();
+	public function __construct(
+		string $rootPath,
+		?string $publicPath = null,
+		?IContainer $parent = null,
+		?string $name = null
+	) {
+		// parent::__construct();
 
 		if ($parent !== null) {
 			$parent->addComponent($this, $name);
@@ -65,9 +54,11 @@ class LogsControl extends Control {
 		$template = $this->getTemplate();
 		$this->getTypes();
 
-		$template->publicPath = $this->publicPath;
-		$template->types = json_encode($this->types);
-		$template->logs = json_encode($this->readLogs());
+		$template->setParameters([
+			'publicPath' => $this->publicPath,
+			'types' => json_encode($this->types),
+			'logs' => json_encode($this->readLogs()),
+		]);
 		$template->setFile(__DIR__ . '/templates/logs.latte');
 		$template->render();
 	}
@@ -76,27 +67,7 @@ class LogsControl extends Control {
 		$this->disabled = $types;
 	}
 
-	private function getTypes(): void {
-		$logFiles = glob($this->logPath . '*.log');
-
-		if (!is_array($logFiles)) {
-			return;
-		}
-
-		foreach ($logFiles as $logFile) {
-			$type = (string) pathinfo($logFile, PATHINFO_FILENAME);
-
-			if (in_array($type, $this->disabled)) {
-				continue;
-			}
-
-			$this->types[] = $type;
-		}
-	}
-
-	/**
-	 * @return array<int, array<string, string|null>>
-	 */
+	/** @return array<int, array<string, string|null>> */
 	public function readLogs(): array {
 		$all = [];
 		$logFiles = glob($this->logPath . '*.log');
@@ -112,7 +83,7 @@ class LogsControl extends Control {
 				$rows = [];
 				$type = (string) pathinfo($logFile, PATHINFO_FILENAME);
 
-				if (in_array($type, $this->disabled)) {
+				if (in_array($type, $this->disabled, true)) {
 					continue;
 				}
 
@@ -204,6 +175,24 @@ class LogsControl extends Control {
 		}
 
 		$this->redirect('this');
+	}
+
+	private function getTypes(): void {
+		$logFiles = glob($this->logPath . '*.log');
+
+		if (!is_array($logFiles)) {
+			return;
+		}
+
+		foreach ($logFiles as $logFile) {
+			$type = (string) pathinfo($logFile, PATHINFO_FILENAME);
+
+			if (in_array($type, $this->disabled, true)) {
+				continue;
+			}
+
+			$this->types[] = $type;
+		}
 	}
 
 }

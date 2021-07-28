@@ -17,7 +17,9 @@
 		"nette/application": "~3.0",
 		"nette/utils": "~3.0",
 		"tracy/tracy": "~2.8",
-		"cakephp/chronos": "~2.0"
+		"cakephp/chronos": "~2.0",
+		"phpstan/phpstan-nette": "^0.12.21",
+		"phpstan/extension-installer": "^1.1"
 	},
 	"autoload": {
 		"psr-4": {
