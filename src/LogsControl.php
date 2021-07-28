@@ -174,7 +174,7 @@ class LogsControl extends Control {
 					continue;
 				}
 
-				$zip->addFile($log, $log);
+				$zip->addFile($log, pathinfo($log, PATHINFO_BASENAME));
 			}
 
 			$zip->close();
