@@ -7,20 +7,21 @@
 
 <div id="logs-app"></div>
 
-<script type="application/json" id="__INITIAL_STATE__" n:syntax="double">
-	{
-		"types": {{$types|noescape}},
-		"logs": {{$logs|noescape}}
-	}
-
+<script n:syntax="double">
+	const types = {{$types|noescape}};
+    const logs = {{$logs|noescape}};
 </script>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script src="//cdn.jsdelivr.net/npm/less@4.1.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+
 <script type="module" n:syntax="off">
 	import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.esm.browser.min.js';
+	// import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 	import momentjs from 'https://cdn.jsdelivr.net/npm/moment@2.29.1/dist/moment.js';
-
-	const initialState = document.querySelector('#__INITIAL_STATE__');
 
 	const defaultClasses = {
 		ul: 'pagination',
@@ -102,7 +103,7 @@
 			},
 			hasLast() {
 				return (this.value === this.pageCount)
-			},
+			}
 		},
 		watch: {
 			value: function () {
@@ -156,7 +157,7 @@
 					next: '&rarr;'
 				},
 				logs: [],
-				types: JSON.parse(initialState.innerHTML).types,
+				types: types,
 				toggleFilter: {},
 				filter: {},
 				descFilter: '',
@@ -198,13 +199,13 @@
 					});
 				}
 
-				// if (this.datetime !== '') {
-				// 	result = result.filter(({ dateTime }) => {
-				// 		const pattern = /(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2}):(\d{2})/;
-				// 		const dt = new Date(dateTime.replace(pattern, '$3-$2-$1 $4:$5:$6'));
-				// 		console.log(dt)
-				// 	});
-				// }
+                /*if (this.dateTimeFilter !== '') {
+					result = result.filter(({ dateTime }) => {
+				{*!// 		const pattern = /(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2}):(\d{2})/;*}
+						const dt = new Date(dateTime.replace(pattern, '$3-$2-$1 $4:$5:$6'));
+						console.log(dt)
+					});
+				}*/
 
 				return result.slice().sort((a, b) => {
 					return this.momentDate(b.dateTime) - this.momentDate(a.dateTime)
@@ -234,7 +235,7 @@
 			const hash = window.location.hash;
 
 			if (hash.length >= 1) {
-				let pageNumber = parseInt(hash.substr(1));
+				let pageNumber = parseInt(hash.substring(1));
 
 				if (pageNumber > this.pages) {
 					pageNumber = this.pages;
@@ -290,6 +291,11 @@
 					return log.type === type;
 				}).length;
 			},
+            filteredCount(type) {
+				return this.filteredLog.filter(log => {
+					return log.type === type;
+				}).length;
+            },
 			momentDate(dateTime) {
 				return momentjs.utc(dateTime, 'DD.MM.YYYY HH:mm:ss').toDate()
 			},
@@ -301,9 +307,12 @@
 					.then(data => {
 						content = data;
 					})
-					.catch(err => console.error(err))
+					.catch(err => console.error(err));
 
-				document.querySelector('#fileContent').src = 'data:text/html;charset=utf-8,' + escape(content);
+                const iframe = document.querySelector('#fileContent');
+				iframe.contentWindow.document.open();
+				iframe.contentWindow.document.write(content);
+				iframe.contentWindow.document.close();
 			},
 			filterLog(type) {
 				return this.logs.filter(log => {
@@ -311,11 +320,7 @@
 				})
 			},
 			getLogs() {
-				if (initialState !== null) {
-					this.logs = JSON.parse(initialState.innerHTML).logs
-				} else {
-					this.logs = []
-				}
+				this.logs = logs ?? []
 			}
 		},
 	})
@@ -333,7 +338,7 @@
                 <div class="click panel" :class="filter[type] ? `panel-${getColor(type)}` : 'panel-default'"
                      @click="toggleFilter[type]">
                     <div class="panel-heading text-center filter" data-type="info">
-                        <h2><strong>{{ logCount(type) }}</strong></h2>
+                        <h2><strong>{{ filteredCount(type) !== logCount(type) ? filteredCount(type) + ' / ' : '' }}{{ logCount(type) }}</strong></h2>
                         {{ type }}.log
                     </div>
                 </div>
@@ -352,8 +357,8 @@
         <table class="table table-stripped table-bordered table-hover table-condensed">
             <thead>
                 <tr>
-                    <th>Date And Time</th>
-                    <th>Description</th>
+                    <th>Datum a čas</th>
+                    <th>Popis</th>
                     <th></th>
                 </tr>
                 <tr>

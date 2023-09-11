@@ -4,9 +4,22 @@ namespace Netleak\Logs;
 
 use Cake\Chronos\Chronos;
 use DateTime;
+use Nette\Application\AbortException;
+use Nette\Application\ApplicationException;
 use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Control;
+use Nette\Application\UI\InvalidLinkException;
 use Nette\ComponentModel\IContainer;
+use Nette\DeprecatedException;
+use Nette\InvalidArgumentException;
+use Nette\InvalidStateException;
+use Nette\Utils\AssertionException;
+use Nette\Utils\ImageException;
+use Nette\Utils\JsonException;
+use Nette\Utils\RegexpException;
+use Tracy\Debugger;
+use Tracy\ILogger;
+use Tracy\Logger;
 use ZipArchive;
 
 class LogsControl extends Control {
@@ -29,6 +42,9 @@ class LogsControl extends Control {
 
 	private ?string $publicPath = '/';
 
+	/** @var array<string>|false */
+	private $logFiles;
+
 	public function __construct(
 		string $rootPath,
 		?string $publicPath = null,
@@ -48,16 +64,44 @@ class LogsControl extends Control {
 		$this->rootPath = $rootPath;
 		$this->logPath = $rootPath . '/log/';
 		$this->tempPath = $rootPath . '/temp/';
+		$this->logFiles = glob($this->logPath . '*.log');
 	}
 
+	/**
+	 * @throws \JsonException
+	 * @throws InvalidLinkException
+	 */
 	public function render(): void {
+		/*$errs = [
+			InvalidLinkException::class,
+			ApplicationException::class,
+			InvalidArgumentException::class,
+			JsonException::class,
+			ImageException::class,
+			DeprecatedException::class,
+			AbortException::class,
+			AssertionException::class,
+			InvalidStateException::class,
+			RegexpException::class
+		];
+
+		$logger = [ILogger::DEBUG, ILogger::INFO, ILogger::WARNING, ILogger::ERROR, ILogger::EXCEPTION];
+
+		for ($i = 0; $i < 100000; $i++) {
+			try {
+				throw new $errs[array_rand($errs)];
+			} catch (\Throwable $e) {
+				Debugger::log($e, $logger[array_rand($logger)]);
+			}
+		}*/
+
 		$template = $this->getTemplate();
 		$this->getTypes();
 
 		$template->setParameters([
 			'publicPath' => $this->publicPath,
-			'types' => json_encode($this->types),
-			'logs' => json_encode($this->readLogs()),
+			'types' => json_encode($this->types, JSON_THROW_ON_ERROR),
+			'logs' => json_encode($this->readLogs(), JSON_THROW_ON_ERROR),
 		]);
 		$template->setFile(__DIR__ . '/templates/logs.latte');
 		$template->render();
@@ -67,13 +111,15 @@ class LogsControl extends Control {
 		$this->disabled = $types;
 	}
 
-	/** @return array<int, array<string, string|null>> */
+	/**
+	 * @return array<int, array<string, string|null>>
+	 * @throws InvalidLinkException
+	 */
 	public function readLogs(): array {
 		$all = [];
-		$logFiles = glob($this->logPath . '*.log');
 
-		if (is_array($logFiles)) {
-			foreach ($logFiles as $logFile) {
+		if (is_array($this->logFiles)) {
+			foreach (array_slice($this->logFiles, -10000, 10000) as $logFile) {
 				$file = file($logFile);
 
 				if (!is_array($file)) {
@@ -103,10 +149,10 @@ class LogsControl extends Control {
 		$allList = [];
 
 		foreach (array_reverse($all) as $row) {
-			preg_match('/(exception--[\S]+.html)/', $row['message'], $file);
+			preg_match('/(' . $row['type'] . '--\S+.html)/', $row['message'], $file);
 			$dateTime = DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19));
 
-			$fileLink = !empty($file) || (isset($file[0]) && file_exists($this->logPath . $file[0]))
+			$fileLink = !empty($file) && (isset($file[0]) && file_exists($this->logPath . $file[0]))
 				? $this->link('showLogHtml!', ['fileName' => $file[0]]) : null;
 
 			$allList[] = [
