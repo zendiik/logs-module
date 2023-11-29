@@ -179,24 +179,21 @@ class LogsControl extends Control {
 	}
 
 	public function handleDelete(): void {
-		$check = shell_exec('echo $SHELL');
-		$delLogs = [
-			'win' => 'del /q log\*',
-			'unix' => 'rm -rf log/*',
-		];
+		$files = glob($this->logPath . '*');
 
-		$delLogs = $check === "\$SHELL\n"
-			? $delLogs['win']
-			: $delLogs['unix'];
+		if (is_array($files)) {
+			foreach ($files as $file) {
+				if (!is_file($file)) {
+					continue;
+				}
 
-		if ($this->rootPath !== null) {
-			chdir($this->rootPath);
-
-			exec($delLogs . ' 2>&1', $output);
-
-			$template = $this->getTemplate();
-			$template->logs = json_encode($this->readLogs());
+				unlink($file);
+			}
 		}
+
+		$this->logFiles = glob($this->logPath . '*.log');
+		$template = $this->getTemplate();
+		$template->logs = json_encode($this->readLogs());
 
 		$this->redirect('this');
 	}
