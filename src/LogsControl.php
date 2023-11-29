@@ -2,24 +2,14 @@
 
 namespace Netleak\Logs;
 
+ini_set('memory_limit', '1G');
+
 use Cake\Chronos\Chronos;
 use DateTime;
-use Nette\Application\AbortException;
-use Nette\Application\ApplicationException;
 use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
 use Nette\ComponentModel\IContainer;
-use Nette\DeprecatedException;
-use Nette\InvalidArgumentException;
-use Nette\InvalidStateException;
-use Nette\Utils\AssertionException;
-use Nette\Utils\ImageException;
-use Nette\Utils\JsonException;
-use Nette\Utils\RegexpException;
-use Tracy\Debugger;
-use Tracy\ILogger;
-use Tracy\Logger;
 use ZipArchive;
 
 class LogsControl extends Control {
@@ -51,8 +41,6 @@ class LogsControl extends Control {
 		?IContainer $parent = null,
 		?string $name = null
 	) {
-		// parent::__construct();
-
 		if ($parent !== null) {
 			$parent->addComponent($this, $name);
 		}
@@ -60,6 +48,8 @@ class LogsControl extends Control {
 		if ($publicPath !== null) {
 			$this->publicPath = $publicPath;
 		}
+
+		$rootPath = rtrim($rootPath, '/');
 
 		$this->rootPath = $rootPath;
 		$this->logPath = $rootPath . '/log/';
@@ -72,29 +62,6 @@ class LogsControl extends Control {
 	 * @throws InvalidLinkException
 	 */
 	public function render(): void {
-		/*$errs = [
-			InvalidLinkException::class,
-			ApplicationException::class,
-			InvalidArgumentException::class,
-			JsonException::class,
-			ImageException::class,
-			DeprecatedException::class,
-			AbortException::class,
-			AssertionException::class,
-			InvalidStateException::class,
-			RegexpException::class
-		];
-
-		$logger = [ILogger::DEBUG, ILogger::INFO, ILogger::WARNING, ILogger::ERROR, ILogger::EXCEPTION];
-
-		for ($i = 0; $i < 100000; $i++) {
-			try {
-				throw new $errs[array_rand($errs)];
-			} catch (\Throwable $e) {
-				Debugger::log($e, $logger[array_rand($logger)]);
-			}
-		}*/
-
 		$template = $this->getTemplate();
 		$this->getTypes();
 
@@ -167,16 +134,27 @@ class LogsControl extends Control {
 	}
 
 	public function handleShowLogHtml(string $fileName): void {
-		$filePath = $this->logPath . $fileName;
+		$fileName = str_replace(['../', '..\\'], '', $fileName);
+
+		$filePath = $this->logPath . basename($fileName);
+
+		if (!preg_match('/--\S+.html/', $fileName)) {
+			$filePath = $this->tempPath . 'cache/error.html';
+		}
 
 		if (!file_exists($filePath)) {
-			return;
+			$filePath = $this->tempPath . 'cache/error.html';
+			$handle = fopen($filePath, 'wb');
+			assert(is_resource($handle));
+
+			fwrite($handle, 'File not found!');
+			fclose($handle);
 		}
 
 		$this->getPresenter()->sendResponse(new FileResponse($filePath));
 	}
 
-	public function handleExportLogs(): void {
+	public function handleExport(): void {
 		$logDirectory = $this->logPath;
 		$zipName = 'logs_' . Chronos::now()->format('d-m-Y_h-i-s') . '.zip';
 		$zipPath = $this->tempPath . 'cache/' . $zipName;
@@ -200,7 +178,7 @@ class LogsControl extends Control {
 		$this->getPresenter()->sendResponse(new FileResponse($zipPath, $zipName));
 	}
 
-	public function handleDeleteLogs(): void {
+	public function handleDelete(): void {
 		$check = shell_exec('echo $SHELL');
 		$delLogs = [
 			'win' => 'del /q log\*',
