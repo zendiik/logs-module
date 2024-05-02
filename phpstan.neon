@@ -1,8 +1,13 @@
 parameters:
+	treatPhpDocTypesAsCertain: false
+	checkMissingIterableValueType: false
+	checkGenericClassInNonGenericObjectType: false
 	level: max
 	paths:
 		- src
-	bootstrapFiles:
-		- %rootDir%/../../../phpstan-bootstrap.php
+	parallel:
+		jobSize: 20
+		maximumNumberOfProcesses: 32
+		minimumNumberOfJobsPerProcess: 2
 	ignoreErrors:
 		- '#Call to an undefined method Nette\\Application\\UI\\Template\:\:setParameters\(\)\.#'

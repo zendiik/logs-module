@@ -6,13 +6,14 @@ ini_set('memory_limit', '1G');
 
 use Cake\Chronos\Chronos;
 use DateTime;
+use JsonException;
 use Nette\Application\Responses\FileResponse;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
 use Nette\ComponentModel\IContainer;
 use ZipArchive;
 
-class LogsControl extends Control {
+abstract class LogsControl extends Control {
 
 	public const RETURN_COUNT = 1;
 
@@ -24,7 +25,7 @@ class LogsControl extends Control {
 	/** @var array<string> */
 	public array $disabled = [];
 
-	private ?string $rootPath;
+	private ?string $rootPath; // @phpcs:ignore
 
 	private ?string $logPath;
 
@@ -33,32 +34,28 @@ class LogsControl extends Control {
 	private ?string $publicPath = '/';
 
 	/** @var array<string>|false */
-	private $logFiles;
+	private array|false $logFiles;
 
 	public function __construct(
 		string $rootPath,
 		?string $publicPath = null,
 		?IContainer $parent = null,
-		?string $name = null
+		?string $name = null,
 	) {
-		if ($parent !== null) {
-			$parent->addComponent($this, $name);
-		}
+		$parent?->addComponent($this, $name);
 
 		if ($publicPath !== null) {
 			$this->publicPath = $publicPath;
 		}
 
-		$rootPath = rtrim($rootPath, '/');
-
-		$this->rootPath = $rootPath;
-		$this->logPath = $rootPath . '/log/';
-		$this->tempPath = $rootPath . '/temp/';
+		$this->rootPath = rtrim($rootPath, '/');
+		$this->logPath = $this->rootPath . '/log/';
+		$this->tempPath = $this->rootPath . '/temp/';
 		$this->logFiles = glob($this->logPath . '*.log');
 	}
 
 	/**
-	 * @throws \JsonException
+	 * @throws JsonException
 	 * @throws InvalidLinkException
 	 */
 	public function render(): void {
@@ -120,7 +117,8 @@ class LogsControl extends Control {
 			$dateTime = DateTime::createFromFormat('Y-m-d H-i-s', substr($row['message'], 1, 19));
 
 			$fileLink = !empty($file) && (isset($file[0]) && file_exists($this->logPath . $file[0]))
-				? $this->link('showLogHtml!', ['fileName' => $file[0]]) : null;
+				? $this->link('showLogHtml!', ['fileName' => $file[0]])
+				: null;
 
 			$allList[] = [
 				'dateTime' => $dateTime ? $dateTime->format('d.m.Y H:i:s') : 'datum neexistuje!',
