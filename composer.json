@@ -1,7 +1,7 @@
 {
 	"name": "netleak/log-control",
 	"description": "Logs control module for Nette.",
-	"version": "v3.1.0",
+	"version": "v3.1.1",
 	"license": "MIT",
 	"authors": [
 		{

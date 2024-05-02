@@ -13,7 +13,7 @@ use Nette\Application\UI\InvalidLinkException;
 use Nette\ComponentModel\IContainer;
 use ZipArchive;
 
-abstract class LogsControl extends Control {
+final class LogsControl extends Control {
 
 	public const RETURN_COUNT = 1;
 
