@@ -15,9 +15,9 @@ use ZipArchive;
 
 final class LogsControl extends Control {
 
-	public const RETURN_COUNT = 1;
+	public const int RETURN_COUNT = 1;
 
-	public const RETURN_DATA = 2;
+	public const int RETURN_DATA = 2;
 
 	/** @var array<string> */
 	public array $types = [];

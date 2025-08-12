@@ -1,7 +1,7 @@
 {
 	"name": "netleak/log-control",
 	"description": "Logs control module for Nette.",
-	"version": "v3.1.1",
+	"version": "v3.1.2",
 	"license": "MIT",
 	"authors": [
 		{
@@ -9,14 +9,14 @@
 			"email": "netleak@zendovo.eu"
 		}
 	],
-	"minimum-stability": "stable",
+	"minimum-stability": "dev",
 	"require": {
-		"php": ">=8.1",
+		"php": ">=8.3",
 		"ext-zip": "*",
 		"ext-json": "*",
-		"nette/di": "~3.0",
-		"nette/application": "~3.0",
-		"nette/utils": "~3.0",
+		"nette/di": "~3.0 || ~4.0",
+		"nette/application": "~3.0 || ~4.0",
+		"nette/utils": "~3.0 || ~4.0",
 		"tracy/tracy": "~2.10",
 		"cakephp/chronos": "~3.0"
 	},
