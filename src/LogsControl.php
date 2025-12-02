@@ -16,8 +16,8 @@ use ZipArchive;
 final class LogsControl extends Control {
 
 	public const RETURN_COUNT = 1;
-
 	public const RETURN_DATA = 2;
+	const LOG_EXTENSION = '*.log';
 
 	/** @var array<string> */
 	public array $types = [];
@@ -51,7 +51,7 @@ final class LogsControl extends Control {
 		$this->rootPath = rtrim($rootPath, '/');
 		$this->logPath = $this->rootPath . '/log/';
 		$this->tempPath = $this->rootPath . '/temp/';
-		$this->logFiles = glob($this->logPath . '*.log');
+		$this->logFiles = glob($this->logPath . self::LOG_EXTENSION);
 	}
 
 	/**
@@ -65,7 +65,7 @@ final class LogsControl extends Control {
 		$template->setParameters([
 			'publicPath' => $this->publicPath,
 			'types' => json_encode($this->types, JSON_THROW_ON_ERROR),
-			'logs' => json_encode($this->readLogs(), JSON_THROW_ON_ERROR),
+			'logs' => json_encode(mb_convert_encoding($this->readLogs(), 'UTF-8', 'UTF-8'), JSON_THROW_ON_ERROR),
 		]);
 		$template->setFile(__DIR__ . '/templates/logs.latte');
 		$template->render();
@@ -189,7 +189,7 @@ final class LogsControl extends Control {
 			}
 		}
 
-		$this->logFiles = glob($this->logPath . '*.log');
+		$this->logFiles = glob($this->logPath . self::LOG_EXTENSION);
 		$template = $this->getTemplate();
 		$template->logs = json_encode($this->readLogs());
 
@@ -197,7 +197,7 @@ final class LogsControl extends Control {
 	}
 
 	private function getTypes(): void {
-		$logFiles = glob($this->logPath . '*.log');
+		$logFiles = glob($this->logPath . self::LOG_EXTENSION);
 
 		if (!is_array($logFiles)) {
 			return;
